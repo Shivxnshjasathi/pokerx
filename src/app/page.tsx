@@ -383,110 +383,110 @@ export default function Home() {
       <div className="min-h-screen relative flex flex-col items-center justify-center p-6 sm:p-12 overflow-hidden bg-black font-sans">
         {/* Cinematic Background Image */}
         <div className="absolute inset-0 z-0 scale-105">
-           <img 
-             src="/poker_lobby_bg_1776534734810.png" 
-             className="w-full h-full object-cover opacity-60 pointer-events-none blur-[1px]"
-             alt="Poker Table Background"
-           />
-           <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-transparent to-[#100624]/40" />
-           <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
+          <img
+            src="/poker_lobby_bg_1776534734810.png"
+            className="w-full h-full object-cover opacity-60 pointer-events-none blur-[1px]"
+            alt="Poker Table Background"
+          />
+          <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-transparent to-[#100624]/40" />
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
         </div>
 
-        <div className="relative z-10 w-full max-w-xl flex flex-col items-center justify-center space-y-12 animate-in fade-in zoom-in duration-1000">
+        <div className="relative z-10 w-full max-w-sm sm:max-w-xl flex flex-col items-center justify-center space-y-6 sm:space-y-12 animate-in fade-in zoom-in duration-1000 px-4">
           {/* Brand Identity */}
-          <div className="flex flex-col items-center space-y-4">
-             <div className="relative group">
-                <div className="absolute -inset-8 bg-emerald-500/20 blur-[60px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
-                <h1 className="text-7xl sm:text-9xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white/80 to-emerald-400 drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]">
-                  POKERX
-                </h1>
-             </div>
-             <p className="text-emerald-500/60 font-black uppercase tracking-[0.6em] text-[10px] sm:text-xs">Elite Multiplayer Hold'em Experience</p>
+          <div className="flex flex-col items-center space-y-2 sm:space-y-4 text-center">
+            <div className="relative group">
+              <div className="absolute -inset-8 bg-emerald-500/10 blur-[60px] rounded-full opacity-40 group-hover:opacity-80 transition-opacity duration-1000" />
+              <h1 className="text-6xl sm:text-9xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white/80 to-emerald-400 drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]">
+                POKERX
+              </h1>
+            </div>
+            <p className="text-emerald-500/60 font-black uppercase tracking-[0.4em] text-[8px] sm:text-[10px] max-w-[200px] sm:max-w-none">Elite Multiplayer Experience</p>
           </div>
 
           {/* Lobby Controls Card */}
-          <div className="w-full bg-white/[0.04] backdrop-blur-3xl border border-white/10 rounded-[48px] p-8 sm:p-12 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] flex flex-col space-y-8">
-            <div className="space-y-4">
+          <div className="w-full bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[40px] p-6 sm:p-12 shadow-[0_40px_100px_rgba(0,0,0,0.6)] space-y-6 sm:space-y-10">
+            <div className="space-y-3 sm:space-y-4">
               <div className="relative group/input">
-                 <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-400 group-focus-within/input:scale-110 transition-transform">
-                    <UserPlus className="w-5 h-5" />
-                 </div>
-                 <input
-                   type="text"
-                   placeholder="Enter Professional Alias"
-                   value={playerName}
-                   onChange={(e) => setPlayerName(e.target.value)}
-                   className="w-full bg-black/60 border border-white/5 rounded-3xl py-5 pl-16 pr-8 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 transition-all font-bold tracking-wide"
-                 />
+                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-400/50 group-focus-within/input:text-emerald-400 transition-colors">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Professional Alias"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 sm:py-5 pl-16 pr-8 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/40 focus:ring-4 focus:ring-emerald-500/5 transition-all font-bold tracking-wide text-sm sm:text-base"
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                 <div className="relative group/input">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-amber-400">
-                       <Wallet className="w-4 h-4" />
-                    </div>
-                    <input
-                      type="number"
-                      placeholder="Chips"
-                      value={startingChips}
-                      onChange={(e) => setStartingChips(parseInt(e.target.value) || 0)}
-                      className="w-full bg-black/60 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-amber-500/50 transition-all font-mono"
-                    />
-                 </div>
-                 <div className="relative group/input">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-indigo-400">
-                       <Clock className="w-4 h-4" />
-                    </div>
-                    <input
-                      type="number"
-                      placeholder="Timer"
-                      value={turnTimeout}
-                      onChange={(e) => setTurnTimeout(parseInt(e.target.value) || 15)}
-                      className="w-full bg-black/60 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 transition-all font-mono"
-                    />
-                 </div>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className="relative group/input">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-400/50">
+                    <Wallet className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="number"
+                    placeholder="Chips"
+                    value={startingChips}
+                    onChange={(e) => setStartingChips(parseInt(e.target.value) || 0)}
+                    className="w-full bg-black/40 border border-white/5 rounded-xl py-3 sm:py-4 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-amber-500/40 transition-all font-mono text-xs sm:text-sm"
+                  />
+                </div>
+                <div className="relative group/input">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400/50">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="number"
+                    placeholder="Timer"
+                    value={turnTimeout}
+                    onChange={(e) => setTurnTimeout(parseInt(e.target.value) || 15)}
+                    className="w-full bg-black/40 border border-white/5 rounded-xl py-3 sm:py-4 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all font-mono text-xs sm:text-sm"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 <button
-                   onClick={createTable}
-                   className="group p-6 bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/20 rounded-[32px] flex flex-col items-center justify-center transition-all active:scale-[0.98] shadow-2xl relative overflow-hidden"
-                 >
-                   <PlusCircle className="w-8 h-8 text-white mb-2 group-hover:scale-110 transition-transform" />
-                   <span className="text-[10px] items-center text-center font-black uppercase tracking-widest text-white/90">Create Private Session</span>
-                 </button>
+            <div className="space-y-3 sm:space-y-4">
+              <button
+                onClick={createTable}
+                className="w-full p-4 sm:p-6 bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/20 rounded-3xl flex items-center justify-center space-x-3 transition-all active:scale-[0.97] shadow-lg shadow-emerald-900/20 group hover:shadow-emerald-500/20"
+              >
+                <PlusCircle className="w-6 h-6 sm:w-8 sm:h-8" />
+                <span className="text-[11px] sm:text-xs font-black uppercase tracking-widest">Create Private Room</span>
+              </button>
 
-                 <button
-                   onClick={() => {
-                     const id = prompt("Enter 6-Character Room code:");
-                     if (id) {
-                       setTableId(id.toUpperCase());
-                       joinTable();
-                     }
-                   }}
-                   className="group p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[32px] flex flex-col items-center justify-center transition-all active:scale-[0.98] shadow-2xl relative overflow-hidden"
-                 >
-                   <ArrowDownRight className="w-8 h-8 text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
-                   <span className="text-[10px] items-center text-center font-black uppercase tracking-widest text-white/90">Enter Existing Room</span>
-                 </button>
-               </div>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <button
+                  onClick={() => {
+                    const id = prompt("Enter 6-Character Room code:");
+                    if (id) {
+                      setTableId(id.toUpperCase());
+                      joinTable();
+                    }
+                  }}
+                  className="p-4 sm:p-10 bg-white/[0.05] hover:bg-white/[0.08] border border-white/5 rounded-3xl flex flex-col items-center justify-center transition-all active:scale-[0.97] group"
+                >
+                  <ArrowDownRight className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400 mb-2" />
+                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white/60">Join Room</span>
+                </button>
 
-               <button
-                 onClick={startSoloGame}
-                 className="w-full py-6 bg-white/5 hover:bg-white/10 text-white font-black rounded-3xl transition-all active:scale-95 flex items-center justify-center space-x-3 uppercase tracking-[0.3em] text-xs border border-white/10 shadow-xl"
-               >
-                 <Cpu className="w-5 h-5 text-indigo-400" />
-                 <span>Solo Engine Training</span>
-               </button>
+                <button
+                  onClick={startSoloGame}
+                  className="p-4 sm:p-10 bg-white/[0.05] hover:bg-white/[0.08] border border-white/5 rounded-3xl flex flex-col items-center justify-center transition-all active:scale-[0.97] group"
+                >
+                  <Cpu className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400 mb-2" />
+                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white/60">Solo Engine</span>
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Social Proof / Version Footer */}
-          <div className="flex flex-col items-center space-y-2 opacity-30">
-             <div className="text-[9px] font-black uppercase tracking-[0.5em] text-slate-500">Atomic Firestore Transactions Active</div>
-             <p className="text-[7px] font-bold text-slate-600">POKERX PRO RELEASE v0.9 • 120HZ ENGINE</p>
+          <div className="flex flex-col items-center space-y-2 opacity-30 pb-4 sm:pb-0">
+            <div className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.4em] text-slate-500">Atomic Transactions Active</div>
+            <p className="text-[7px] font-bold text-slate-600">POKERX PRO RELEASE v0.9 • 120HZ ENGINE</p>
           </div>
         </div>
       </div>
@@ -494,54 +494,57 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#21113c] via-[#100624] to-[#0a0216] font-sans text-slate-200 overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
-      {/* Header - Minimalist Branding */}
-      <header className="absolute top-[env(safe-area-inset-top)] left-0 right-0 px-6 py-4 flex justify-between items-center z-[100]">
+    <div className="min-h-screen bg-gradient-to-b from-[#21113c] via-[#100624] to-[#0a0216] font-sans text-slate-200 overflow-hidden box-border">
+      {/* Professional Navigation Bar */}
+      <nav className="fixed top-0 left-0 right-0 h-[70px] sm:h-[80px] bg-black/40 backdrop-blur-2xl border-b border-white/5 flex justify-between items-center px-6 z-[100] pt-[env(safe-area-inset-top)] box-content">
         <div className="flex items-center space-x-4">
-           <div className="text-3xl font-black tracking-tighter italic">
-             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-white/80">POKER</span>
-             <span className="text-emerald-500">X</span>
-           </div>
-           <span className="hidden sm:inline-block px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-black tracking-widest text-slate-500">
-             ROOM ID: {tableId}
-           </span>
+          <div className="text-2xl sm:text-3xl font-black tracking-tighter italic">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-white/90">POKER</span>
+            <span className="text-emerald-500">X</span>
+          </div>
+          <div className="hidden md:flex items-center px-3 py-1 bg-white/5 border border-white/10 rounded-full">
+            <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">Pro Table • #{tableId}</span>
+          </div>
         </div>
 
-        <button 
+        <button
           onClick={() => setShowDrawer(true)}
-          className="p-3 bg-white/5 border border-white/10 rounded-[20px] hover:bg-white/10 transition-all active:scale-95 shadow-2xl backdrop-blur-md"
+          className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all active:scale-95 shadow-xl group"
         >
-          <Menu className="w-6 h-6 text-white" />
+          <Menu className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-300" />
         </button>
-      </header>
+      </nav>
 
-      {/* Side Drawer - Premium Game Controls */}
-      <div className={cn(
-        "fixed inset-0 z-[200] transition-opacity duration-500",
-        showDrawer ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-      )}>
-        {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDrawer(false)} />
-        
-        {/* Drawer Panel */}
+      {/* Main Table Area - Positioned below nav */}
+      <div className="relative pt-[70px] sm:pt-[80px] h-screen overflow-hidden">
+
+        {/* Side Drawer - Premium Game Controls */}
         <div className={cn(
-          "absolute top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-[#0c041a]/95 backdrop-blur-3xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-out p-8 flex flex-col pt-[env(safe-area-inset-top)]",
-          showDrawer ? "translate-x-0" : "translate-x-full"
+          "fixed inset-0 z-[200] transition-opacity duration-500",
+          showDrawer ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}>
-           <div className="flex justify-between items-center mb-10">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDrawer(false)} />
+
+          {/* Drawer Panel */}
+          <div className={cn(
+            "absolute top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-[#0c041a]/95 backdrop-blur-3xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-out p-8 flex flex-col pt-[env(safe-area-inset-top)]",
+            showDrawer ? "translate-x-0" : "translate-x-full"
+          )}>
+            <div className="flex justify-between items-center mb-10">
               <h3 className="text-xl font-black uppercase tracking-widest text-white/40 italic">Menu</h3>
-              <button 
+              <button
                 onClick={() => setShowDrawer(false)}
                 className="p-2 hover:bg-white/5 rounded-full transition-colors"
                 id="close-drawer"
               >
-                 <X className="w-6 h-6 text-white/50" />
+                <X className="w-6 h-6 text-white/50" />
               </button>
-           </div>
+            </div>
 
-           <div className="flex-1 space-y-4">
+            <div className="flex-1 space-y-4">
               {/* Wallet / Top Up */}
-              <button 
+              <button
                 onClick={() => {
                   const amount = prompt("Top up amount:", "1000");
                   if (amount && parseInt(amount) > 0) {
@@ -551,265 +554,267 @@ export default function Home() {
                 }}
                 className="w-full p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[24px] flex items-center group transition-all"
               >
-                 <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 flex items-center justify-center mr-4">
-                    <Wallet className="w-5 h-5 text-emerald-400" />
-                 </div>
-                 <div className="text-left">
-                    <div className="text-sm font-black text-white">Refill Wallet</div>
-                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Add Chips to Stack</div>
-                 </div>
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 flex items-center justify-center mr-4">
+                  <Wallet className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div className="text-left">
+                  <div className="text-sm font-black text-white">Refill Wallet</div>
+                  <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Add Chips to Stack</div>
+                </div>
               </button>
 
-              <button 
+              <button
                 onClick={() => { setShowLedger(true); setShowDrawer(false); }}
                 className="w-full p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[24px] flex items-center group transition-all"
               >
-                 <div className="w-10 h-10 rounded-2xl bg-amber-500/20 flex items-center justify-center mr-4">
-                    <TrendingUp className="w-5 h-5 text-amber-400" />
-                 </div>
-                 <div className="text-left">
-                    <div className="text-sm font-black text-white">Financials</div>
-                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Hand History & Ledger</div>
-                 </div>
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 flex items-center justify-center mr-4">
+                  <TrendingUp className="w-5 h-5 text-amber-400" />
+                </div>
+                <div className="text-left">
+                  <div className="text-sm font-black text-white">Financials</div>
+                  <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Hand History & Ledger</div>
+                </div>
               </button>
 
-              <button 
+              <button
                 onClick={() => { setShowRules(true); setShowDrawer(false); }}
                 className="w-full p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[24px] flex items-center group transition-all"
               >
-                 <div className="w-10 h-10 rounded-2xl bg-blue-500/20 flex items-center justify-center mr-4">
-                    <Info className="w-5 h-5 text-blue-400" />
-                 </div>
-                 <div className="text-left">
-                    <div className="text-sm font-black text-white">Game Rules</div>
-                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Rankings Guide</div>
-                 </div>
+                <div className="w-10 h-10 rounded-2xl bg-blue-500/20 flex items-center justify-center mr-4">
+                  <Info className="w-5 h-5 text-blue-400" />
+                </div>
+                <div className="text-left">
+                  <div className="text-sm font-black text-white">Game Rules</div>
+                  <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Rankings Guide</div>
+                </div>
               </button>
 
               <div className="pt-6 pb-2">
-                 <div className="h-px bg-white/5 w-full mb-4" />
-                 <div className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mb-4 ml-2">Session Control</div>
+                <div className="h-px bg-white/5 w-full mb-4" />
+                <div className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mb-4 ml-2">Session Control</div>
               </div>
 
               {gameState && (
-                 <button 
-                    onClick={() => { handleStartGame(); setShowDrawer(false); }}
-                    className="w-full p-6 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white border border-emerald-400/20 rounded-[28px] flex items-center shadow-lg shadow-emerald-900/40 group transition-all"
-                 >
-                    <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center mr-4">
-                       <Play className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                       <div className="text-base font-black uppercase tracking-tighter">Start Hand</div>
-                       <div className="text-[9px] font-bold text-white/50 uppercase tracking-widest italic">Proceed to Dealing</div>
-                    </div>
-                 </button>
+                <button
+                  onClick={() => { handleStartGame(); setShowDrawer(false); }}
+                  className="w-full p-6 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white border border-emerald-400/20 rounded-[28px] flex items-center shadow-lg shadow-emerald-900/40 group transition-all"
+                >
+                  <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center mr-4">
+                    <Play className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-base font-black uppercase tracking-tighter">Start Hand</div>
+                    <div className="text-[9px] font-bold text-white/50 uppercase tracking-widest italic">Proceed to Dealing</div>
+                  </div>
+                </button>
               )}
 
               {gameState && !gameState.isActive && (
-                 <button 
-                    onClick={() => { addBot(); setShowDrawer(false); }}
-                    className="w-full p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[24px] flex items-center group transition-all"
-                 >
-                    <div className="w-10 h-10 rounded-2xl bg-purple-500/20 flex items-center justify-center mr-4">
-                       <Cpu className="w-5 h-5 text-purple-400" />
-                    </div>
-                    <div className="text-left">
-                       <div className="text-sm font-black text-white">Join Bots</div>
-                       <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Add Professional AI</div>
-                    </div>
-                 </button>
+                <button
+                  onClick={() => { addBot(); setShowDrawer(false); }}
+                  className="w-full p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[24px] flex items-center group transition-all"
+                >
+                  <div className="w-10 h-10 rounded-2xl bg-purple-500/20 flex items-center justify-center mr-4">
+                    <Cpu className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-black text-white">Join Bots</div>
+                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Add Professional AI</div>
+                  </div>
+                </button>
               )}
-           </div>
+            </div>
 
-           <div className="mt-auto pt-10">
-              <button 
+            <div className="mt-auto pt-10">
+              <button
                 onClick={leaveTable}
                 className="w-full p-5 bg-rose-500/5 hover:bg-rose-500/10 text-rose-500 border border-rose-500/10 rounded-[24px] flex items-center group transition-all"
               >
-                 <div className="w-10 h-10 rounded-2xl bg-rose-500/20 flex items-center justify-center mr-4">
-                    <LogOut className="w-5 h-5" />
-                 </div>
-                 <div className="text-left">
-                    <div className="text-sm font-black">Disconnect</div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">Exit Current Session</div>
-                 </div>
-              </button>
-           </div>
-        </div>
-      </div>
-
-      {/* Main Table Area */}
-      {gameState ? (
-        <Table gameState={gameState} playerId={myPlayerId} onAction={sendAction} onNextHand={handleStartGame} />
-      ) : (
-        <div className="h-screen flex items-center justify-center">
-          <div className="text-xl font-semibold text-slate-400 animate-pulse">Waiting for table data...</div>
-        </div>
-      )}
-
-      {/* Logs overlay bottom right */}
-      <div className="absolute bottom-6 right-6 w-80 bg-black/60 border border-white/10 rounded-2xl p-4 max-h-48 overflow-y-auto backdrop-blur-md hidden md:block">
-        <h3 className="text-white/50 text-xs font-bold uppercase tracking-wider mb-2">Game Log</h3>
-        <div className="space-y-1">
-          {gameState?.logs?.slice(-10).map((log, i) => (
-            <div key={i} className="text-sm text-slate-300">
-              <span className="text-slate-500 mr-2">{new Date(log.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-              {log.message}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Ledger Modal */}
-      {showLedger && gameState && (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-[#1a1b26] border-t sm:border border-white/10 rounded-t-[32px] sm:rounded-[32px] w-full max-w-lg shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden scale-in animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
-            {/* Modal Header */}
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-emerald-500/10 to-transparent">
-              <div className="flex items-center space-x-3">
-                <div className="bg-emerald-500/20 p-2 rounded-xl">
-                  <Trophy className="w-5 h-5 text-emerald-400" />
+                <div className="w-10 h-10 rounded-2xl bg-rose-500/20 flex items-center justify-center mr-4">
+                  <LogOut className="w-5 h-5" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-black text-white uppercase tracking-tight">Financial Ledger</h3>
-                  <p className="text-xs text-slate-500 font-semibold tracking-wide">Real-time Transaction Analysis</p>
+                <div className="text-left">
+                  <div className="text-sm font-black">Disconnect</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">Exit Current Session</div>
                 </div>
-              </div>
-              <button onClick={() => setShowLedger(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                <X className="w-6 h-6 text-slate-400" />
               </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-              {gameState.players.map((p, idx) => {
-                const profit = p.chips - p.buyIn;
-                const isProfit = profit >= 0;
-                return (
-                  <div key={p.id} className="bg-white/[0.03] border border-white/5 p-4 rounded-2xl flex items-center justify-between">
-                    <div className="flex items-center space-x-3 text-left">
-                      <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-white/10 text-xl">👤</div>
-                      <div>
-                        <div className="text-white font-bold text-sm tracking-wide">{p.name}</div>
-                        <div className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Buy-in: ${p.buyIn}</div>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="text-white font-black text-lg leading-tight">${p.chips}</div>
-                      <div className={cn(
-                        "flex items-center justify-end font-bold text-xs",
-                        isProfit ? "text-emerald-400" : "text-rose-400"
-                      )}>
-                        {isProfit ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
-                        {isProfit ? "+" : "-"}${Math.abs(profit)}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-6 bg-black/20 border-t border-white/5 flex justify-center text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">
-              System Version 1.0.4 • {gameState.id}
             </div>
           </div>
         </div>
-      )}
 
-      {/* Rules Modal */}
-      {showRules && (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-[#1a1b26] border-t sm:border border-white/10 rounded-t-[32px] sm:rounded-[32px] w-full max-w-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden scale-in animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 max-h-[95vh] flex flex-col">
-            {/* Modal Header */}
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-amber-500/10 to-transparent">
-              <div className="flex items-center space-x-3">
-                <div className="bg-amber-500/20 p-2 rounded-xl">
-                  <Trophy className="w-5 h-5 text-amber-400" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-black text-white uppercase tracking-tight">How to Play Poker</h3>
-                  <p className="text-xs text-slate-500 font-semibold tracking-wide">Official PokerOrg Professional Guide</p>
-                </div>
+        {/* Main Table Area */}
+        {gameState ? (
+          <Table gameState={gameState} playerId={myPlayerId} onAction={sendAction} onNextHand={handleStartGame} />
+        ) : (
+          <div className="h-screen flex items-center justify-center">
+            <div className="text-xl font-semibold text-slate-400 animate-pulse">Waiting for table data...</div>
+          </div>
+        )}
+
+        {/* Logs overlay bottom right */}
+        <div className="absolute bottom-6 right-6 w-80 bg-black/60 border border-white/10 rounded-2xl p-4 max-h-48 overflow-y-auto backdrop-blur-md hidden md:block">
+          <h3 className="text-white/50 text-xs font-bold uppercase tracking-wider mb-2">Game Log</h3>
+          <div className="space-y-1">
+            {gameState?.logs?.slice(-10).map((log, i) => (
+              <div key={i} className="text-sm text-slate-300">
+                <span className="text-slate-500 mr-2">{new Date(log.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                {log.message}
               </div>
-              <button onClick={() => setShowRules(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                <X className="w-6 h-6 text-slate-400" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto text-slate-300 leading-relaxed custom-scrollbar">
-              <section>
-                <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Quick-Start Texas Hold'em</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2 text-xs">
-                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">1.</span> Each player gets two hole cards face-down.</p>
-                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">2.</span> Three communal cards are dealt face-up ('The Flop').</p>
-                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">3.</span> One more communal card is dealt ('The Turn').</p>
-                  </div>
-                  <div className="space-y-2 text-xs">
-                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">4.</span> A final communal card is dealt ('The River').</p>
-                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">5.</span> Remaining players reveal best 5-card hand ('Showdown').</p>
-                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">6.</span> Strongest hand wins the pot!</p>
-                  </div>
-                </div>
-              </section>
-
-              <section className="bg-white/5 p-4 rounded-2xl border border-white/10">
-                <h4 className="text-white font-bold mb-3 flex items-center"><Coins className="w-4 h-4 mr-2 text-amber-400" /> Hand Rankings (Hierarchy)</h4>
-                <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-[10px]">
-                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-emerald-400 font-bold">1. Royal Flush</span> <span>A,K,Q,J,10 (Same Suit)</span></li>
-                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">2. Straight Flush</span> <span>5 Sequence, Same Suit</span></li>
-                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">3. Four of a Kind</span> <span>4 Cards of one rank</span></li>
-                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">4. Full House</span> <span>3 Rank + 2 Rank</span></li>
-                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">5. Flush</span> <span>5 of Same Suit</span></li>
-                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">6. Straight</span> <span>5 in Sequence</span></li>
-                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">7. Three of a Kind</span> <span>3 of Same Rank</span></li>
-                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">8. Two Pairs</span> <span>2 Different Pairs</span></li>
-                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">9. One Pair</span> <span>2 of Same Rank</span></li>
-                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-slate-500 font-bold">10. High Card</span> <span>Highest Card Wins</span></li>
-                </ul>
-              </section>
-
-              <section>
-                <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Professional Strategy</h4>
-                <div className="space-y-4">
-                  <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
-                    <h5 className="text-white font-bold text-xs mb-1">Rule of 4 and 2</h5>
-                    <p className="text-[11px] opacity-70">Count your 'outs' (cards you need). Multiply by 4 on the flop (2 cards to come) or by 2 on the turn (1 card to come) to get your % chance to win.</p>
-                  </div>
-                  <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
-                    <h5 className="text-white font-bold text-xs mb-1">Understanding Position</h5>
-                    <p className="text-[11px] opacity-70">Acting after others gives you more information. Having 'position' is a massive strategic advantage in Texas Hold'em.</p>
-                  </div>
-                </div>
-              </section>
-
-              <section>
-                <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Betting Options</h4>
-                <div className="grid grid-cols-2 gap-3 text-[11px]">
-                  <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>CALL:</strong> Match the current bet.</div>
-                  <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>RAISE:</strong> Increase the current bet.</div>
-                  <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>CHECK:</strong> Pass turn (if no prior bet).</div>
-                  <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>FOLD:</strong> Exit the current hand.</div>
-                </div>
-              </section>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-6 bg-black/20 border-t border-white/5 flex justify-center text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">
-              Courtesy of Poker.org Professional Standards
-            </div>
+            ))}
           </div>
         </div>
-      )}
-      {/* Portrait Orientation Hint Overlay */}
-      <div className="landscape-hint pointer-events-none">
-        <div className="phone-tilt"></div>
-        <h2 className="text-2xl font-black mb-2">PLEASE TILT YOUR PHONE</h2>
-        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">For the best poker experience, play in landscape mode.</p>
+
+        {/* Ledger Modal */}
+        {showLedger && gameState && (
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+            <div className="bg-[#1a1b26] border-t sm:border border-white/10 rounded-t-[32px] sm:rounded-[32px] w-full max-w-lg shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden scale-in animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+              {/* Modal Header */}
+              <div className="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-emerald-500/10 to-transparent">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-emerald-500/20 p-2 rounded-xl">
+                    <Trophy className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-white uppercase tracking-tight">Financial Ledger</h3>
+                    <p className="text-xs text-slate-500 font-semibold tracking-wide">Real-time Transaction Analysis</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowLedger(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                  <X className="w-6 h-6 text-slate-400" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+                {gameState.players.map((p, idx) => {
+                  const profit = p.chips - p.buyIn;
+                  const isProfit = profit >= 0;
+                  return (
+                    <div key={p.id} className="bg-white/[0.03] border border-white/5 p-4 rounded-2xl flex items-center justify-between">
+                      <div className="flex items-center space-x-3 text-left">
+                        <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-white/10 text-xl">👤</div>
+                        <div>
+                          <div className="text-white font-bold text-sm tracking-wide">{p.name}</div>
+                          <div className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Buy-in: ${p.buyIn}</div>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-white font-black text-lg leading-tight">${p.chips}</div>
+                        <div className={cn(
+                          "flex items-center justify-end font-bold text-xs",
+                          isProfit ? "text-emerald-400" : "text-rose-400"
+                        )}>
+                          {isProfit ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
+                          {isProfit ? "+" : "-"}${Math.abs(profit)}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-6 bg-black/20 border-t border-white/5 flex justify-center text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">
+                System Version 1.0.4 • {gameState.id}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Rules Modal */}
+        {showRules && (
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+            <div className="bg-[#1a1b26] border-t sm:border border-white/10 rounded-t-[32px] sm:rounded-[32px] w-full max-w-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden scale-in animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 max-h-[95vh] flex flex-col">
+              {/* Modal Header */}
+              <div className="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-amber-500/10 to-transparent">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-amber-500/20 p-2 rounded-xl">
+                    <Trophy className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-white uppercase tracking-tight">How to Play Poker</h3>
+                    <p className="text-xs text-slate-500 font-semibold tracking-wide">Official PokerOrg Professional Guide</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowRules(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                  <X className="w-6 h-6 text-slate-400" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto text-slate-300 leading-relaxed custom-scrollbar">
+                <section>
+                  <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Quick-Start Texas Hold'em</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2 text-xs">
+                      <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">1.</span> Each player gets two hole cards face-down.</p>
+                      <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">2.</span> Three communal cards are dealt face-up ('The Flop').</p>
+                      <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">3.</span> One more communal card is dealt ('The Turn').</p>
+                    </div>
+                    <div className="space-y-2 text-xs">
+                      <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">4.</span> A final communal card is dealt ('The River').</p>
+                      <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">5.</span> Remaining players reveal best 5-card hand ('Showdown').</p>
+                      <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">6.</span> Strongest hand wins the pot!</p>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                  <h4 className="text-white font-bold mb-3 flex items-center"><Coins className="w-4 h-4 mr-2 text-amber-400" /> Hand Rankings (Hierarchy)</h4>
+                  <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-[10px]">
+                    <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-emerald-400 font-bold">1. Royal Flush</span> <span>A,K,Q,J,10 (Same Suit)</span></li>
+                    <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">2. Straight Flush</span> <span>5 Sequence, Same Suit</span></li>
+                    <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">3. Four of a Kind</span> <span>4 Cards of one rank</span></li>
+                    <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">4. Full House</span> <span>3 Rank + 2 Rank</span></li>
+                    <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">5. Flush</span> <span>5 of Same Suit</span></li>
+                    <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">6. Straight</span> <span>5 in Sequence</span></li>
+                    <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">7. Three of a Kind</span> <span>3 of Same Rank</span></li>
+                    <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">8. Two Pairs</span> <span>2 Different Pairs</span></li>
+                    <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">9. One Pair</span> <span>2 of Same Rank</span></li>
+                    <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-slate-500 font-bold">10. High Card</span> <span>Highest Card Wins</span></li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Professional Strategy</h4>
+                  <div className="space-y-4">
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                      <h5 className="text-white font-bold text-xs mb-1">Rule of 4 and 2</h5>
+                      <p className="text-[11px] opacity-70">Count your 'outs' (cards you need). Multiply by 4 on the flop (2 cards to come) or by 2 on the turn (1 card to come) to get your % chance to win.</p>
+                    </div>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                      <h5 className="text-white font-bold text-xs mb-1">Understanding Position</h5>
+                      <p className="text-[11px] opacity-70">Acting after others gives you more information. Having 'position' is a massive strategic advantage in Texas Hold'em.</p>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Betting Options</h4>
+                  <div className="grid grid-cols-2 gap-3 text-[11px]">
+                    <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>CALL:</strong> Match the current bet.</div>
+                    <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>RAISE:</strong> Increase the current bet.</div>
+                    <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>CHECK:</strong> Pass turn (if no prior bet).</div>
+                    <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>FOLD:</strong> Exit the current hand.</div>
+                  </div>
+                </section>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-6 bg-black/20 border-t border-white/5 flex justify-center text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">
+                Courtesy of Poker.org Professional Standards
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Portrait Orientation Hint Overlay */}
+        <div className="landscape-hint pointer-events-none">
+          <div className="phone-tilt"></div>
+          <h2 className="text-2xl font-black mb-2">PLEASE TILT YOUR PHONE</h2>
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">For the best poker experience, play in landscape mode.</p>
+        </div>
       </div>
     </div>
   );

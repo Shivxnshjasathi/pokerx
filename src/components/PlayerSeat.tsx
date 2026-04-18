@@ -58,9 +58,7 @@ export const PlayerSeat = memo(({
       {/* Cards Display (Tilted and Overlapping like the image) */}
       <div className={cn(
         "relative z-30 pointer-events-none flex transition-all duration-500",
-        isSelf && !showCards
-          ? "-mb-8 sm:-mb-12 scale-[1.1] sm:scale-[1.3] -space-x-6" 
-          : "-mb-4 scale-[0.6] sm:scale-[0.8] -space-x-8"
+        "-mb-6 scale-[0.9] sm:scale-100 -space-x-8"
       )}>
         {player.cards.length > 0 ? player.cards.map((card, i) => (
           <CardView 
@@ -69,18 +67,18 @@ export const PlayerSeat = memo(({
              hidden={!isSelf && !showCards} 
              className={cn(
                 "shadow-xl border-white/20 transition-all duration-500",
-                i === 0 ? "-rotate-[10deg] translate-x-2" : "rotate-[10deg] -translate-x-2"
+                i === 0 ? "-rotate-6" : "rotate-6"
              )} 
           />
         )) : (
-            <>
-                <div className="w-14 h-20 bg-blue-600 rounded-lg border-2 border-white shadow-xl -rotate-[10deg] translate-x-2 flex items-center justify-center">
-                    <div className="w-full h-full opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
-                </div>
-                <div className="w-14 h-20 bg-blue-600 rounded-lg border-2 border-white shadow-xl rotate-[10deg] -translate-x-2 flex items-center justify-center">
-                    <div className="w-full h-full opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
-                </div>
-            </>
+           <>
+              <div className="w-14 h-20 bg-blue-600 rounded-lg border-2 border-white shadow-xl -rotate-6 flex items-center justify-center overflow-hidden">
+                <div className="w-full h-full opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
+              </div>
+              <div className="w-14 h-20 bg-blue-600 rounded-lg border-2 border-white shadow-xl rotate-6 flex items-center justify-center overflow-hidden">
+                <div className="w-full h-full opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
+              </div>
+           </>
         )}
       </div>
 
@@ -106,6 +104,7 @@ export const PlayerSeat = memo(({
              {isSelf ? "YOU" : player.name}
            </span>
         </div>
+      </div>
 
         {/* Dealer Button Placement (Next to cards) */}
         {isDealer && (
@@ -113,31 +112,6 @@ export const PlayerSeat = memo(({
                 <span className="text-red-700 font-black text-xs">D</span>
             </div>
         )}
-
-        {/* Action Chips Indicator (Next to cards) */}
-        {player.currentBet > 0 && (
-            <div className={cn(
-                "absolute -top-6 flex space-x-1 pointer-events-none filter drop-shadow-lg",
-                positionClass.includes("right") ? "-left-14" : "-right-14"
-            )}>
-                {/* 3D Stack 1 (Blue) */}
-                <div className="flex flex-col-reverse items-center -space-y-1">
-                   <div className="w-4 h-1.5 rounded-full bg-blue-600 border border-black/20" />
-                   <div className="w-4 h-1.5 rounded-full bg-blue-500 border border-white/20" />
-                </div>
-                {/* 3D Stack 2 (Red) */}
-                <div className="flex flex-col-reverse items-center -space-y-1 mt-1">
-                   <div className="w-4 h-1.5 rounded-full bg-red-700 border border-black/20" />
-                   <div className="w-4 h-1.5 rounded-full bg-red-500 border border-white/20" />
-                </div>
-                {/* 3D Stack 3 (Yellow) */}
-                <div className="flex flex-col-reverse items-center -space-y-1">
-                   <div className="w-4 h-1.5 rounded-full bg-yellow-600 border border-black/20" />
-                   <div className="w-4 h-1.5 rounded-full bg-yellow-400 border border-white/20" />
-                </div>
-            </div>
-        )}
-      </div>
 
       {/* Active Timer Pulse Overlay */}
       {isActiveTurn && (

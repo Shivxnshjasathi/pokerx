@@ -33,12 +33,12 @@ export const Table = ({ gameState, playerId, onAction, onNextHand }: TableProps)
 
   // Position players similar to the image (Optimized for both Portrait and Landscape)
   const positions = useMemo(() => [
-    "bottom-[2%] sm:bottom-[12%] left-1/2 -translate-x-1/2", // self
-    "bottom-[30%] -left-2 sm:-left-10",         // left middle
-    "top-[10%] -left-2 sm:-left-6",            // left top
-    "top-[2%] left-1/2 -translate-x-1/2 scale-[0.6] sm:scale-100", // top center
-    "top-[10%] -right-2 sm:-right-6",          // right top
-    "bottom-[30%] -right-2 sm:-right-10",        // right middle
+    "bottom-[8%] sm:bottom-[10%] left-1/2 -translate-x-1/2 scale-110 sm:scale-125 z-50", // self (bottom) - LOWERED
+    "top-[40%] -left-4 sm:left-4 -translate-y-1/2",                   // left middle
+    "top-[12%] -left-1 sm:left-10",                                   // left top
+    "top-[2%] left-1/2 -translate-x-1/2",                             // top center
+    "top-[12%] -right-1 sm:right-10",                                 // right top
+    "top-[40%] -right-4 sm:right-4 -translate-y-1/2",                 // right middle
   ], []);
 
   const orderedPlayers = useMemo(() => {
@@ -66,57 +66,64 @@ export const Table = ({ gameState, playerId, onAction, onNextHand }: TableProps)
 
   const lastLog = gameState.logs?.[gameState.logs.length - 1]?.message;
 
+  // Calculate Live Pot (Total Pot + Pending Bets in current round)
+  const livePot = useMemo(() => {
+    if (!gameState) return 0;
+    const pendingBets = gameState.players.reduce((acc, p) => acc + (p.currentBet || 0), 0);
+    return gameState.pot + pendingBets;
+  }, [gameState.pot, gameState.players]);
+
+  if (!gameState) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-[#1a0b33]">
+        <div className="text-xl font-semibold text-slate-400 animate-pulse">Initializing Table...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative w-full max-w-6xl mx-auto h-[100dvh] sm:h-[90vh] flex flex-col items-center justify-center overflow-hidden">
-      
-      {/* Main Table Felt Background (No oval, just solid green as requested) */}
-      <div className="absolute inset-x-0 top-0 bottom-0 bg-[#074723] z-0 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '15px 15px' }}></div>
-        {/* Soft center glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1)_0,transparent_60%)]"></div>
+    <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden">
+      {/* Table Surface */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center">
+         <div className="w-[120%] h-[120%] bg-[#074723] rounded-full blur-[80px] opacity-20 pointer-events-none" />
+         <div className="absolute inset-0 bg-[#074020]/20" />
       </div>
 
-      {/* Pot Display (Large text in center) */}
-      <div className="relative z-10 -mt-16 sm:-mt-20 flex flex-col items-center scale-75 sm:scale-100 landscape:scale-[0.6] sm:landscape:scale-100">
-         <div className="flex flex-col items-center mb-6">
-            <div className="w-12 h-6 bg-black/20 rounded-full blur-xl absolute -top-4"></div>
-            <div className="text-white font-black text-4xl sm:text-7xl tracking-tighter drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] mb-4">
-               ${gameState.pot.toLocaleString()}
-            </div>
-            
-            {/* 3D Chip Stack Pile */}
-            <div className="relative w-12 h-16 transform -translate-y-2">
-               <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col-reverse items-center">
-                  {[...Array(6)].map((_, i) => (
-                    <div 
-                      key={i}
-                      className="w-8 h-2 rounded-full border border-black/20 shadow-sm"
-                      style={{ 
-                        backgroundColor: i === 5 ? '#f8fafc' : '#e2e8f0',
-                        marginTop: '-4px',
-                        zIndex: i 
-                      }}
-                    />
-                  ))}
-               </div>
-            </div>
-         </div>
-
-         {/* Community Cards (Modern layout with spacing) */}
-         <div className="flex space-x-1.5 sm:space-x-3 mt-4">
-            {(gameState.communityCards || []).map((card, i) => (
-              <div key={i} className="animate-in slide-in-from-bottom duration-700">
-                <CardView card={card} className="shadow-2xl border-white/20" />
+      {/* Center Table Content - Perfectly Centered in available space */}
+      <div className="flex-1 w-full flex flex-col items-center justify-center z-10 p-4 sm:p-8 mt-10 sm:mt-20">
+          <div className="flex flex-col items-center space-y-6 sm:space-y-12 w-full max-w-4xl">
+              {/* Total Pot HUD */}
+              <div className="flex flex-col items-center group transition-all duration-500">
+                 <div className="text-[8px] sm:text-[10px] font-black text-emerald-400/40 uppercase tracking-[0.5em] mb-2 sm:mb-4">Total Pot</div>
+                 <div className="relative">
+                    <div className="absolute -inset-10 bg-emerald-500/10 blur-[50px] rounded-full opacity-30 group-hover:opacity-50 transition-opacity" />
+                    <h2 className="text-5xl sm:text-8xl font-black text-white relative flex flex-col items-center">
+                       <div className="flex items-baseline space-x-2">
+                          <span className="text-emerald-500 text-2xl sm:text-4xl font-black italic shadow-emerald-500/50">$</span>
+                          <span className="tabular-nums tracking-tighter drop-shadow-2xl">{livePot.toLocaleString()}</span>
+                       </div>
+                    </h2>
+                 </div>
               </div>
-            ))}
-            {Array.from({ length: 5 - (gameState.communityCards?.length || 0) }).map((_, i) => (
-              <div key={i} className="w-14 h-20 sm:w-16 sm:h-24 rounded-lg bg-black/10 border-2 border-dashed border-white/5" />
-            ))}
-         </div>
+
+              {/* Community Cards Display */}
+              <div className="flex space-x-2 sm:space-x-4">
+                 {(gameState.communityCards || []).map((card, i) => (
+                   <div key={i} className="animate-in slide-in-from-bottom-4 duration-500 scale-[0.8] sm:scale-100 shadow-[0_15px_40px_rgba(0,0,0,0.6)] rounded-xl">
+                     <CardView card={card} className="border-white/10" />
+                   </div>
+                 ))}
+                 {Array.from({ length: 5 - (gameState.communityCards?.length || 0) }).map((_, i) => (
+                   <div key={i} className="w-12 h-16 sm:w-16 sm:h-24 rounded-[14px] sm:rounded-2xl bg-white/[0.02] border border-white/[0.05] shadow-inner scale-[0.8] sm:scale-100 flex items-center justify-center backdrop-blur-md">
+                      <div className="w-6 h-6 border border-white/5 rounded-full opacity-5" />
+                   </div>
+                 ))}
+              </div>
+          </div>
       </div>
 
-      {/* Players Ring */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Players Ring Overlay */}
+      <div className="absolute inset-0 pointer-events-none z-20">
           {orderedPlayers.map((player, i) => (
             <PlayerSeat
               key={player.id}
@@ -133,14 +140,19 @@ export const Table = ({ gameState, playerId, onAction, onNextHand }: TableProps)
           ))}
       </div>
 
-      {/* Action Controls - Large Black Rounded Buttons */}
+      {/* Action Controls Overlay */}
       {isMyTurn && (
-        <div className="fixed bottom-4 sm:bottom-10 left-0 right-0 flex flex-col items-center z-[70] px-4 pointer-events-auto landscape:bottom-[env(safe-area-inset-bottom)] pb-[env(safe-area-inset-bottom)]">
+        <div className="fixed bottom-6 left-0 right-0 flex flex-col items-center z-[100] px-6 pointer-events-auto">
           {showRaiseUI && (
-            <div className="bg-black/90 backdrop-blur-xl border border-white/10 p-4 sm:p-6 rounded-3xl mb-4 w-full max-w-md shadow-2xl animate-in slide-in-from-bottom duration-300 landscape:p-3 landscape:mb-2">
-               <div className="flex justify-between items-center mb-4 landscape:mb-2">
-                  <span className="text-white font-black text-xl sm:text-2xl">${betValue}</span>
-                  <span className="text-slate-500 text-[9px] uppercase font-bold tracking-widest">Raise Amount</span>
+            <div className="bg-[#0c051a]/95 backdrop-blur-3xl border border-white/10 p-6 rounded-[32px] mb-6 w-full max-w-lg shadow-[0_50px_100px_rgba(0,0,0,0.9)] animate-in slide-in-from-bottom-8 duration-500">
+               <div className="flex justify-between items-end mb-6">
+                  <div className="flex flex-col">
+                     <span className="text-slate-500 text-[10px] uppercase font-black tracking-[0.2em] mb-1">Set Raise Amount</span>
+                     <span className="text-emerald-400 font-black text-4xl italic">${betValue}</span>
+                  </div>
+                  <div className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-full">
+                     <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Max: ${me?.chips}</span>
+                  </div>
                </div>
                <input 
                   type="range"
@@ -149,32 +161,41 @@ export const Table = ({ gameState, playerId, onAction, onNextHand }: TableProps)
                   step={10}
                   value={betValue}
                   onChange={(e) => setBetValue(parseInt(e.target.value))}
-                  className="w-full h-1.5 sm:h-2.5 bg-slate-800 rounded-full appearance-none cursor-pointer accent-white mb-4 landscape:mb-2"
+                  className="w-full h-1.5 bg-white/5 rounded-full appearance-none cursor-pointer accent-emerald-500 mb-8"
                />
                <button 
                 onClick={() => {
-                    if (betValue >= me.chips) onAction({ playerId, type: 'all-in' });
+                    if (betValue >= (me?.chips || 0)) onAction({ playerId, type: 'all-in' });
                     else onAction({ playerId, type: 'raise', amount: betValue });
                     setShowRaiseUI(false);
                 }}
-                className="w-full py-3 bg-white text-black rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-gray-200 transition-all active:scale-95"
+                className="w-full py-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black uppercase text-xs tracking-[0.2em] transition-all shadow-xl shadow-emerald-900/40"
                >
-                 Confirm Raise
+                 Place Professional Raise
                </button>
             </div>
           )}
 
-          <div className="flex space-x-2 sm:space-x-4 w-full max-w-xl landscape:max-w-md">
-             <button onClick={() => onAction({ playerId, type: 'fold' })} className="flex-1 py-3 sm:py-4 bg-black border border-white/20 text-white rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-xs hover:bg-slate-900 transition-all active:scale-95 shadow-2xl">
-               Fold
+          <div className="flex space-x-3 w-full max-w-2xl">
+             <button 
+               onClick={() => onAction({ playerId, type: 'fold' })} 
+               className="flex-1 py-5 bg-black/40 backdrop-blur-xl border border-white/10 text-white rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-rose-900/20 hover:border-rose-500/30 transition-all active:scale-95 group"
+             >
+               <span className="group-hover:text-rose-400">Fold</span>
              </button>
              
-             {gameState.highestBet === me.currentBet ? (
-               <button onClick={() => onAction({ playerId, type: 'check' })} className="flex-1 py-3 sm:py-4 bg-black border border-white/20 text-white rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-xs hover:bg-slate-900 transition-all active:scale-95 shadow-2xl">
+             {gameState.highestBet === me?.currentBet ? (
+               <button 
+                 onClick={() => onAction({ playerId, type: 'check' })} 
+                 className="flex-1 py-5 bg-white text-black rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-slate-200 transition-all active:scale-95 shadow-2xl"
+               >
                  Check
                </button>
              ) : (
-               <button onClick={() => onAction({ playerId, type: 'call' })} className="flex-1 py-3 sm:py-4 bg-black border border-white/20 text-white rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-xs hover:bg-slate-900 transition-all active:scale-95 shadow-2xl">
+               <button 
+                 onClick={() => onAction({ playerId, type: 'call' })} 
+                 className="flex-1 py-5 bg-emerald-600 text-white rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-emerald-500 transition-all active:scale-95 shadow-xl shadow-emerald-900/40"
+               >
                  Call
                </button>
              )}
@@ -182,11 +203,11 @@ export const Table = ({ gameState, playerId, onAction, onNextHand }: TableProps)
              <button 
                 onClick={() => setShowRaiseUI(!showRaiseUI)} 
                 className={cn(
-                    "flex-1 py-3 sm:py-4 bg-black border border-white/20 text-white rounded-xl font-bold uppercase tracking-widest text-[9px] sm:text-xs hover:bg-slate-900 transition-all active:scale-95 shadow-2xl",
-                    showRaiseUI && "bg-slate-800"
+                    "flex-1 py-5 bg-black/40 backdrop-blur-xl border border-white/10 text-white rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white/10 transition-all active:scale-95",
+                    showRaiseUI && "bg-white text-black border-transparent"
                 )}
              >
-                {showRaiseUI ? "X" : "Raise"}
+                {showRaiseUI ? "Cancel" : "Raise"}
              </button>
           </div>
         </div>
@@ -194,43 +215,43 @@ export const Table = ({ gameState, playerId, onAction, onNextHand }: TableProps)
 
       {/* Showdown Winners Overlay */}
       {showWinners && !gameState.isActive && gameState.winners && gameState.winners.length > 0 && (
-        <div className="absolute inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-500">
-          <div className="bg-white p-8 sm:p-10 rounded-[40px] max-w-md w-full text-center shadow-[0_20px_60px_rgba(0,0,0,0.4)] scale-in animate-in zoom-in duration-500 relative">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-500">
+          <div className="bg-[#0c041a] border border-white/10 p-8 sm:p-12 rounded-[48px] max-w-lg w-full text-center shadow-[0_50px_100px_rgba(0,0,0,0.8)] scale-in animate-in zoom-in duration-500 relative overflow-hidden">
+            {/* Victory Glow */}
+            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent shadow-[0_0_50px_rgba(16,185,129,0.5)]" />
             
-            {/* Close Button */}
-            <button onClick={() => setShowWinners(false)} className="absolute top-6 right-6 p-2 hover:bg-black/5 rounded-full transition-colors text-slate-400">
+            <button onClick={() => setShowWinners(false)} className="absolute top-8 right-8 p-2 hover:bg-white/5 rounded-full transition-colors text-slate-500">
                <X className="w-6 h-6" />
             </button>
 
-            <div className="bg-yellow-500/10 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-               <Trophy className="w-12 h-12 text-yellow-600" />
+            <div className="bg-emerald-500/10 w-28 h-28 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-emerald-500/20 rotate-12">
+               <Trophy className="w-12 h-12 text-emerald-500 -rotate-12" />
             </div>
 
-            <h2 className="text-black text-3xl font-black mb-1 uppercase tracking-tighter italic">Victory!</h2>
-            <p className="text-slate-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-8">Payout Analysis Complete</p>
+            <h2 className="text-white text-4xl font-black mb-1 uppercase tracking-tighter italic">Victory!</h2>
+            <p className="text-slate-500 text-[10px] font-black tracking-[0.5em] uppercase mb-10 opacity-60">Result Analysis Finalized</p>
 
             <div className="space-y-4 mb-10">
               {gameState.winners.map((w, i) => (
-                <div key={i} className="p-5 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-3xl flex flex-col items-center">
-                  <div className="text-black font-black text-xl mb-1 flex items-center">
-                      <span className="truncate max-w-[200px]">{w.playerIds.map(id => gameState.players.find(p => p.id === id)?.name).join(' & ')}</span>
+                <div key={i} className="p-6 bg-white/[0.03] border border-white/5 rounded-3xl flex flex-col items-center">
+                  <div className="text-slate-400 font-bold text-sm mb-2 uppercase tracking-widest">
+                      {w.playerIds.map(id => gameState.players.find(p => p.id === id)?.name).join(' & ')}
                   </div>
-                  <div className="text-emerald-600 font-bold text-4xl mb-2">${w.amount.toLocaleString()}</div>
-                  <div className="px-4 py-1 bg-black/5 rounded-full text-slate-500 text-[9px] font-black uppercase tracking-widest">{w.handName}</div>
+                  <div className="text-emerald-400 font-black text-5xl mb-3 tabular-nums drop-shadow-lg">${w.amount.toLocaleString()}</div>
+                  <div className="px-5 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-[10px] font-black uppercase tracking-[0.3em]">{w.handName}</div>
                 </div>
               ))}
             </div>
 
-            {/* Continue / Next Hand Button */}
             <button 
                 onClick={() => {
                    if (onNextHand) onNextHand();
                    else setShowWinners(false);
                 }}
-                className="w-full py-5 bg-black text-white rounded-[24px] font-black uppercase tracking-widest text-xs hover:bg-slate-900 transition-all active:scale-95 shadow-xl flex items-center justify-center space-x-3"
+                className="w-full py-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-[28px] font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 shadow-2xl shadow-emerald-900/40 flex items-center justify-center space-x-4 group"
             >
                <span>Continue to Next Hand</span>
-               <ArrowUpRight className="w-5 h-5" />
+               <ArrowUpRight className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </button>
           </div>
         </div>
