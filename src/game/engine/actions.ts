@@ -6,7 +6,39 @@ export const applyAction = (state: GameState, action: Action): GameState => {
   const newState = { ...state, players: state.players.map(p => ({ ...p })), logs: [...state.logs] };
   let amount = action.amount || 0;
 
-  // Top-ups can occur anytime
+  // Non-turn based actions (Join, Leave, Top-up)
+  if (action.type === 'join') {
+    if (newState.players.some(p => p.id === action.playerId)) return newState;
+    if (newState.players.length >= 6) throw new Error("Table is full");
+    
+    newState.players.push({
+      id: action.playerId,
+      name: action.payload?.name || "Player",
+      chips: newState.settings.startingChips,
+      buyIn: newState.settings.startingChips,
+      cards: [],
+      currentBet: 0,
+      totalContribution: 0,
+      isFolded: false,
+      isAllIn: false,
+      hasActed: false,
+      isBot: false,
+    });
+    newState.logs.push({ message: `${action.payload?.name || "Player"} joined the table`, timestamp: Date.now() });
+    newState.lastActivity = Date.now();
+    return newState;
+  }
+
+  if (action.type === 'leave') {
+    newState.players = newState.players.filter(p => p.id !== action.playerId);
+    newState.logs.push({ message: `A player left the table`, timestamp: Date.now() });
+    
+    // If table becomes empty, or game was active and current player left, handle it?
+    // For now keep it simple: just remove. logic will skip their turn.
+    newState.lastActivity = Date.now();
+    return newState;
+  }
+
   if (action.type === 'top-up') {
     const p = newState.players.find(p => p.id === action.playerId);
     if (!p) throw new Error("Player not found");

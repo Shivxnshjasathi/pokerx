@@ -64,10 +64,11 @@ export interface GameState {
   }[];
 }
 
-export type ActionType = 'fold' | 'check' | 'call' | 'bet' | 'raise' | 'all-in' | 'top-up';
+export type ActionType = 'fold' | 'check' | 'call' | 'bet' | 'raise' | 'all-in' | 'top-up' | 'join' | 'leave';
 
 export interface Action {
   playerId: string;
   type: ActionType;
   amount?: number;
+  payload?: any;
 }

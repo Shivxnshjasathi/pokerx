@@ -21,8 +21,9 @@ export default function Home() {
   const [showRules, setShowRules] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [turnTimeout, setTurnTimeout] = useState(15);
+  const [isJoining, setIsJoining] = useState(false);
 
-  const { gameState, loading, sendAction } = useGameState(inGame ? tableId : '');
+  const { gameState, loading: isTableLoading, sendAction } = useGameState(inGame ? tableId : '');
   const hasReceivedInitialState = useRef(false);
   const lastTurnActedRef = useRef<number | null>(null);
 
@@ -90,6 +91,7 @@ export default function Home() {
         lastActivity: Date.now(),
         logs: [{ message: `Table created by ${playerName}`, timestamp: Date.now() }]
       });
+      setTableId(derivedTableId);
       setInGame(true);
     } catch (e: any) {
       console.error(e);
@@ -98,41 +100,40 @@ export default function Home() {
   };
 
   const joinTable = async () => {
-    if (!tableId || !playerName) return;
-    const newPlayerId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
-    setMyPlayerId(newPlayerId);
-    // setInGame moved to end of try
+    if (!tableId) {
+      alert("Please enter a Table ID!");
+      return;
+    }
+    if (!playerName) {
+      alert("Please enter your Alias first!");
+      return;
+    }
 
-
+    setIsJoining(true);
     try {
       const ref = doc(db, 'tables', tableId);
       const snap = await getDoc(ref);
 
-      let finalStartingChips = 1000;
-      let finalSettings: GameSettings = { startingChips: 1000, smallBlind: 10, turnTimeoutSeconds: 15 };
-
-      if (snap.exists()) {
-        const data = snap.data();
-
-        // Inactivity Check (15 minutes = 900,000ms)
-        const fifteenMins = 15 * 60 * 1000;
-        if (data.lastActivity && (Date.now() - data.lastActivity > fifteenMins)) {
-          await deleteDoc(ref);
-          alert("This table has expired due to 15 minutes of inactivity and has been deleted. Please create a new one.");
-          setInGame(false);
-          return;
-        }
-
-        if (data.settings && data.settings.startingChips) {
-          finalStartingChips = data.settings.startingChips;
-          finalSettings = data.settings;
-        }
+      if (!snap.exists()) {
+        alert("This room does not exist. Please check the code or create a new room.");
+        setIsJoining(false);
+        return;
       }
+
+      const data = snap.data();
+      if (data.players?.length >= 6) {
+        alert("This table is already full (max 6 players).");
+        setIsJoining(false);
+        return;
+      }
+
+      const newPlayerId = "player_" + Math.random().toString(36).substr(2, 9);
+      setMyPlayerId(newPlayerId);
 
       const newPlayer: Player = {
         id: newPlayerId,
         name: playerName,
-        chips: finalStartingChips,
+        chips: data.settings?.startingChips || 1000,
         cards: [],
         currentBet: 0,
         totalContribution: 0,
@@ -140,36 +141,20 @@ export default function Home() {
         isAllIn: false,
         hasActed: false,
         isBot: false,
-        buyIn: finalStartingChips
+        buyIn: data.settings?.startingChips || 1000
       };
 
-      if (snap.exists()) {
-        await updateDoc(ref, {
-          players: arrayUnion(newPlayer)
-        });
-      } else {
-        await setDoc(ref, {
-          id: tableId,
-          settings: finalSettings,
-          deck: [],
-          communityCards: [],
-          pot: 0,
-          sidePots: [],
-          currentTurnIndex: 0,
-          dealerIndex: 0,
-          smallBlindIndex: 0,
-          bigBlindIndex: 0,
-          round: 'preflop',
-          minRaise: 0,
-          highestBet: 0,
-          players: [newPlayer],
-          isActive: false,
-          logs: [{ message: `Table created by ${playerName}`, timestamp: Date.now() }]
-        });
-      }
+      await updateDoc(ref, {
+        players: arrayUnion(newPlayer),
+        lastActivity: Date.now()
+      });
+
       setInGame(true);
     } catch (e: any) {
       console.error(e);
+      alert("Join failed: " + e.message);
+    } finally {
+      setIsJoining(false);
     }
   };
 
@@ -370,13 +355,13 @@ export default function Home() {
 
   // Clean exit if table is deleted
   useEffect(() => {
-    if (inGame && !loading && !gameState && tableId && hasReceivedInitialState.current) {
+    if (inGame && !isTableLoading && !gameState && tableId && hasReceivedInitialState.current) {
       setInGame(false);
       setMyPlayerId('');
       setTableId('');
       alert("This table has been closed or expired.");
     }
-  }, [inGame, loading, gameState, tableId]);
+  }, [inGame, isTableLoading, gameState, tableId]);
 
   if (!inGame) {
     return (
@@ -456,30 +441,42 @@ export default function Home() {
                 <PlusCircle className="w-6 h-6 sm:w-8 sm:h-8" />
                 <span className="text-[11px] sm:text-xs font-black uppercase tracking-widest">Create Private Room</span>
               </button>
+            </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                <button
-                  onClick={() => {
-                    const id = prompt("Enter 6-Character Room code:");
-                    if (id) {
-                      setTableId(id.toUpperCase());
-                      joinTable();
-                    }
-                  }}
-                  className="p-4 sm:p-10 bg-white/[0.05] hover:bg-white/[0.08] border border-white/5 rounded-3xl flex flex-col items-center justify-center transition-all active:scale-[0.97] group"
-                >
-                  <ArrowDownRight className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400 mb-2" />
-                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white/60">Join Room</span>
-                </button>
-
-                <button
-                  onClick={startSoloGame}
-                  className="p-4 sm:p-10 bg-white/[0.05] hover:bg-white/[0.08] border border-white/5 rounded-3xl flex flex-col items-center justify-center transition-all active:scale-[0.97] group"
-                >
-                  <Cpu className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400 mb-2" />
-                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white/60">Solo Engine</span>
-                </button>
+            <div className="space-y-4 pt-4 border-t border-white/5">
+              <div className="flex flex-col space-y-3">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] px-2">Join Existing Session</span>
+                <div className="flex space-x-3">
+                  <div className="relative flex-1 group/input">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-400/50">
+                      <ArrowDownRight className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Enter Table ID"
+                      maxLength={6}
+                      value={tableId}
+                      onChange={(e) => setTableId(e.target.value.toUpperCase())}
+                      className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-amber-500/40 transition-all font-mono font-black tracking-[0.2em] text-sm"
+                    />
+                  </div>
+                  <button
+                    onClick={joinTable}
+                    disabled={!tableId || tableId.length < 6}
+                    className="px-8 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all active:scale-95 disabled:opacity-30"
+                  >
+                    Connect
+                  </button>
+                </div>
               </div>
+              
+              <button
+                onClick={startSoloGame}
+                className="w-full py-4 bg-white/[0.05] hover:bg-white/[0.08] text-indigo-400 border border-white/5 rounded-2xl flex items-center justify-center space-x-3 transition-all active:scale-[0.97] group"
+              >
+                <Cpu className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em]">Launch Solo Engine</span>
+              </button>
             </div>
           </div>
 
@@ -657,7 +654,9 @@ export default function Home() {
           <Table gameState={gameState} playerId={myPlayerId} onAction={sendAction} onNextHand={handleStartGame} />
         ) : (
           <div className="h-screen flex items-center justify-center">
-            <div className="text-xl font-semibold text-slate-400 animate-pulse">Waiting for table data...</div>
+            <div className="text-xl font-semibold text-slate-400 animate-pulse">
+              {isTableLoading ? "Connecting to Table..." : "Initializing Seat..."}
+            </div>
           </div>
         )}
 
