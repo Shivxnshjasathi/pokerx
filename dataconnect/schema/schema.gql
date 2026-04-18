@@ -1,0 +1,34 @@
+type User @table {
+  displayName: String!
+  createdAt: Timestamp!
+  email: String
+  photoUrl: String
+}
+
+type Session @table {
+  user: User!
+  sessionDate: Date!
+  gameType: GameType!
+  buyIn: Float!
+  cashOut: Float!
+  createdAt: Timestamp!
+  location: Location
+}
+
+type GameType @table {
+  name: String!
+  description: String
+}
+
+type Bankroll @table {
+  user: User!
+  date: Date!
+  amount: Float!
+  createdAt: Timestamp!
+}
+
+type Location @table {
+  user: User!
+  name: String!
+  address: String
+}

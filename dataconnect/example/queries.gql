@@ -1,0 +1,45 @@
+mutation CreateUser($displayName: String!, $email: String, $photoUrl: String) @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users.") {
+  user_insert(data: {
+    id_expr: "auth.uid",
+    displayName: $displayName,
+    email: $email,
+    photoUrl: $photoUrl,
+    createdAt_expr: "request.time"
+  })
+}
+
+query GetMySessions @auth(level: USER) {
+  sessions(where: {userId: {eq_expr: "auth.uid"}}) {
+    id
+    sessionDate
+    buyIn
+    cashOut
+    gameType {
+      name
+    }
+    location {
+      name
+    }
+    createdAt
+  }
+}
+
+mutation RecordSession($sessionDate: Date!, $gameTypeId: UUID!, $buyIn: Float!, $cashOut: Float!, $locationId: UUID) @auth(level: USER) {
+  session_insert(data: {
+    userId_expr: "auth.uid",
+    sessionDate: $sessionDate,
+    gameTypeId: $gameTypeId,
+    buyIn: $buyIn,
+    cashOut: $cashOut,
+    locationId: $locationId,
+    createdAt_expr: "request.time"
+  })
+}
+
+query GetGameTypes @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  gameTypes {
+    id
+    name
+    description
+  }
+}

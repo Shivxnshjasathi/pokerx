@@ -1,0 +1,82 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "This is seed data, and no real user data is exposed.") {
+  user_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      displayName: "Alice Smith",
+      createdAt: "2023-01-01T10:00:00Z",
+      email: "alice@example.com",
+      photoUrl: "https://example.com/alice.jpg"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440001",
+      displayName: "Bob Johnson",
+      createdAt: "2023-01-02T11:00:00Z",
+      email: "bob@example.com",
+      photoUrl: "https://example.com/bob.jpg"
+    }
+  ])
+  gameType_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440002",
+      name: "Texas Hold'em",
+      description: "No-Limit Texas Hold'em Poker"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440003",
+      name: "Omaha",
+      description: "Pot-Limit Omaha Poker"
+    }
+  ])
+  location_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440004",
+      userId: "550e8400-e29b-41d4-a716-446655440000",
+      name: "Home Game Alice",
+      address: "123 Alice St"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440005",
+      userId: "550e8400-e29b-41d4-a716-446655440001",
+      name: "Casino Royale",
+      address: "456 Main St"
+    }
+  ])
+  session_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440006",
+      userId: "550e8400-e29b-41d4-a716-446655440000",
+      gameTypeId: "550e8400-e29b-41d4-a716-446655440002",
+      locationId: "550e8400-e29b-41d4-a716-446655440004",
+      sessionDate: "2023-01-05",
+      buyIn: 100.00,
+      cashOut: 150.00,
+      createdAt: "2023-01-05T20:00:00Z"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440007",
+      userId: "550e8400-e29b-41d4-a716-446655440001",
+      gameTypeId: "550e8400-e29b-41d4-a716-446655440003",
+      locationId: "550e8400-e29b-41d4-a716-446655440005",
+      sessionDate: "2023-01-06",
+      buyIn: 200.00,
+      cashOut: 180.00,
+      createdAt: "2023-01-06T22:00:00Z"
+    }
+  ])
+  bankroll_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440008",
+      userId: "550e8400-e29b-41d4-a716-446655440000",
+      date: "2023-01-05",
+      amount: 150.00,
+      createdAt: "2023-01-05T20:00:00Z"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440009",
+      userId: "550e8400-e29b-41d4-a716-446655440001",
+      date: "2023-01-06",
+      amount: 180.00,
+      createdAt: "2023-01-06T22:00:00Z"
+    }
+  ])
+}
