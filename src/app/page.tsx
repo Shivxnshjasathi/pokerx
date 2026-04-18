@@ -7,7 +7,7 @@ import { useGameState } from '../hooks/useGameState';
 import { initGame } from '../game/engine/init';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion, deleteDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { Coins, Play, UserPlus, PlusCircle, Wallet, LogOut, TrendingUp, X, Trophy, Bot, Cpu, ArrowUpRight, ArrowDownRight, Menu, Settings, Info } from 'lucide-react';
+import { Coins, Play, UserPlus, PlusCircle, Wallet, LogOut, TrendingUp, X, Trophy, Bot, Cpu, ArrowUpRight, ArrowDownRight, Menu, Settings, Info, Clock } from 'lucide-react';
 import { Player, GameSettings } from '../game/types';
 import { getBotAction } from '../game/engine/bot';
 
@@ -380,110 +380,113 @@ export default function Home() {
 
   if (!inGame) {
     return (
-      <div className="min-h-screen bg-[#06070a] flex flex-col items-center justify-center p-4 overflow-hidden relative">
-        {/* Animated Background Depth */}
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-emerald-600/10 rounded-full blur-[160px] animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[160px] animate-pulse delay-1000"></div>
-
-        {/* Floating Decoration Cards (Visual Only) */}
-        <div className="absolute top-10 left-[15%] opacity-20 rotate-12 animate-float pointer-events-none hidden md:block">
-          <div className="w-24 h-36 border-4 border-white/10 rounded-2xl bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm self-center justify-center flex items-center text-4xl">♠️</div>
+      <div className="min-h-screen relative flex flex-col items-center justify-center p-6 sm:p-12 overflow-hidden bg-black font-sans">
+        {/* Cinematic Background Image */}
+        <div className="absolute inset-0 z-0 scale-105">
+           <img 
+             src="/poker_lobby_bg_1776534734810.png" 
+             className="w-full h-full object-cover opacity-60 pointer-events-none blur-[1px]"
+             alt="Poker Table Background"
+           />
+           <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-transparent to-[#100624]/40" />
+           <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
         </div>
-        <div className="absolute bottom-20 right-[15%] opacity-20 -rotate-12 animate-float delay-700 pointer-events-none hidden md:block">
-          <div className="w-24 h-36 border-4 border-white/10 rounded-2xl bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm self-center justify-center flex items-center text-4xl text-red-500">♥️</div>
-        </div>
 
-        <div className="bg-[#111218]/90 backdrop-blur-3xl p-6 sm:p-10 rounded-[32px] sm:rounded-[48px] w-full max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)] border border-white/[0.05] space-y-8 sm:space-y-10 z-10 scale-in animate-in zoom-in-95 duration-700">
-          <div className="text-center space-y-2 sm:space-y-3">
-            <div className="relative inline-block group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-emerald-700 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-              <h1 className="relative text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-emerald-400 to-emerald-600 tracking-tighter filter drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]">
-                POKERX
-              </h1>
-            </div>
-            <p className="text-slate-500 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] opacity-40">Elite Multiplayer Hold'em</p>
+        <div className="relative z-10 w-full max-w-xl flex flex-col items-center justify-center space-y-12 animate-in fade-in zoom-in duration-1000">
+          {/* Brand Identity */}
+          <div className="flex flex-col items-center space-y-4">
+             <div className="relative group">
+                <div className="absolute -inset-8 bg-emerald-500/20 blur-[60px] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
+                <h1 className="text-7xl sm:text-9xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white/80 to-emerald-400 drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]">
+                  POKERX
+                </h1>
+             </div>
+             <p className="text-emerald-500/60 font-black uppercase tracking-[0.6em] text-[10px] sm:text-xs">Elite Multiplayer Hold'em Experience</p>
           </div>
 
-          <div className="space-y-6">
-            <div className="group relative">
-              <label className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2 block ml-1 text-left group-focus-within:text-emerald-400 transition-colors">Player Identity</label>
-              <div className="relative">
-                <input
-                  className="w-full bg-black/60 border border-white/[0.03] rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 outline-none transition-all placeholder:text-slate-800 font-medium text-lg"
-                  value={playerName}
-                  onChange={e => setPlayerName(e.target.value)}
-                  placeholder="GUEST_PLAYER"
-                />
+          {/* Lobby Controls Card */}
+          <div className="w-full bg-white/[0.04] backdrop-blur-3xl border border-white/10 rounded-[48px] p-8 sm:p-12 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] flex flex-col space-y-8">
+            <div className="space-y-4">
+              <div className="relative group/input">
+                 <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-400 group-focus-within/input:scale-110 transition-transform">
+                    <UserPlus className="w-5 h-5" />
+                 </div>
+                 <input
+                   type="text"
+                   placeholder="Enter Professional Alias"
+                   value={playerName}
+                   onChange={(e) => setPlayerName(e.target.value)}
+                   className="w-full bg-black/60 border border-white/5 rounded-3xl py-5 pl-16 pr-8 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 transition-all font-bold tracking-wide"
+                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                 <div className="relative group/input">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-amber-400">
+                       <Wallet className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="number"
+                      placeholder="Chips"
+                      value={startingChips}
+                      onChange={(e) => setStartingChips(parseInt(e.target.value) || 0)}
+                      className="w-full bg-black/60 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-amber-500/50 transition-all font-mono"
+                    />
+                 </div>
+                 <div className="relative group/input">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-indigo-400">
+                       <Clock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="number"
+                      placeholder="Timer"
+                      value={turnTimeout}
+                      onChange={(e) => setTurnTimeout(parseInt(e.target.value) || 15)}
+                      className="w-full bg-black/60 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 transition-all font-mono"
+                    />
+                 </div>
               </div>
             </div>
 
-            <div className="group relative">
-              <label className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2 block ml-1 text-left group-focus-within:text-emerald-400 transition-colors">Access Code <span className="opacity-30">(Join)</span></label>
-              <input
-                className="w-full bg-black/60 border border-white/[0.03] rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 outline-none transition-all placeholder:text-slate-800 font-mono tracking-widest text-lg"
-                value={tableId}
-                onChange={e => setTableId(e.target.value.toUpperCase())}
-                placeholder="--- ---"
-              />
+            <div className="space-y-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <button
+                   onClick={createTable}
+                   className="group p-6 bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/20 rounded-[32px] flex flex-col items-center justify-center transition-all active:scale-[0.98] shadow-2xl relative overflow-hidden"
+                 >
+                   <PlusCircle className="w-8 h-8 text-white mb-2 group-hover:scale-110 transition-transform" />
+                   <span className="text-[10px] items-center text-center font-black uppercase tracking-widest text-white/90">Create Private Session</span>
+                 </button>
+
+                 <button
+                   onClick={() => {
+                     const id = prompt("Enter 6-Character Room code:");
+                     if (id) {
+                       setTableId(id.toUpperCase());
+                       joinTable();
+                     }
+                   }}
+                   className="group p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[32px] flex flex-col items-center justify-center transition-all active:scale-[0.98] shadow-2xl relative overflow-hidden"
+                 >
+                   <ArrowDownRight className="w-8 h-8 text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
+                   <span className="text-[10px] items-center text-center font-black uppercase tracking-widest text-white/90">Enter Existing Room</span>
+                 </button>
+               </div>
+
+               <button
+                 onClick={startSoloGame}
+                 className="w-full py-6 bg-white/5 hover:bg-white/10 text-white font-black rounded-3xl transition-all active:scale-95 flex items-center justify-center space-x-3 uppercase tracking-[0.3em] text-xs border border-white/10 shadow-xl"
+               >
+                 <Cpu className="w-5 h-5 text-indigo-400" />
+                 <span>Solo Engine Training</span>
+               </button>
             </div>
+          </div>
 
-            {!tableId && (
-              <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="group">
-                  <label className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2 block ml-1 text-left">Buy-in</label>
-                  <input
-                    type="number"
-                    className="w-full bg-black/60 border border-white/[0.03] rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-emerald-500/30 outline-none transition-all font-mono"
-                    value={startingChips}
-                    onChange={e => setStartingChips(parseInt(e.target.value) || 0)}
-                  />
-                </div>
-                <div className="group">
-                  <label className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2 block ml-1 text-left">Turn (s)</label>
-                  <input
-                    type="number"
-                    className="w-full bg-black/60 border border-white/[0.03] rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-emerald-500/30 outline-none transition-all font-mono"
-                    value={turnTimeout}
-                    onChange={e => setTurnTimeout(parseInt(e.target.value) || 15)}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="flex flex-col space-y-4 pt-4">
-              <button
-                onClick={joinTable}
-                className="w-full group bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.05] text-white font-bold py-5 rounded-2xl transition-all flex items-center justify-center space-x-3 active:scale-[0.98] relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                <UserPlus className="w-5 h-5 text-emerald-400" />
-                <span className="tracking-wide">Join Game</span>
-              </button>
-
-              <div className="relative flex py-3 items-center">
-                <div className="flex-grow border-t border-white/[0.03]"></div>
-                <span className="flex-shrink-0 mx-6 text-slate-800 text-[9px] font-black tracking-[0.5em] italic">CREATE SESSION</span>
-                <div className="flex-grow border-t border-white/[0.03]"></div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-3">
-                <button
-                  onClick={createTable}
-                  className="w-full bg-gradient-to-br from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 text-white font-black py-4 sm:py-5 rounded-2xl transition-all shadow-[0_20px_40px_-15px_rgba(16,185,129,0.4)] active:scale-[0.98] flex items-center justify-center space-x-3 uppercase tracking-widest text-xs sm:text-sm"
-                >
-                  <PlusCircle className="w-5 h-5" />
-                  <span>Private Table</span>
-                </button>
-
-                <button
-                  onClick={startSoloGame}
-                  className="w-full bg-gradient-to-br from-indigo-500 to-purple-700 hover:from-indigo-400 hover:to-purple-600 text-white font-black py-4 sm:py-5 rounded-2xl transition-all shadow-[0_20px_40px_-15px_rgba(79,70,229,0.4)] active:scale-[0.98] flex items-center justify-center space-x-3 uppercase tracking-widest text-xs sm:text-sm border border-white/10"
-                >
-                  <Bot className="w-5 h-5" />
-                  <span>Play vs AI</span>
-                </button>
-              </div>
-            </div>
+          {/* Social Proof / Version Footer */}
+          <div className="flex flex-col items-center space-y-2 opacity-30">
+             <div className="text-[9px] font-black uppercase tracking-[0.5em] text-slate-500">Atomic Firestore Transactions Active</div>
+             <p className="text-[7px] font-bold text-slate-600">POKERX PRO RELEASE v0.9 • 120HZ ENGINE</p>
           </div>
         </div>
       </div>
