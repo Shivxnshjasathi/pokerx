@@ -623,8 +623,8 @@ export default function Home() {
                    <Trophy className="w-5 h-5 text-amber-400" />
                  </div>
                  <div>
-                   <h3 className="text-xl font-black text-white uppercase tracking-tight">Professional Poker Rules</h3>
-                   <p className="text-xs text-slate-500 font-semibold tracking-wide">Official Bicycle® Laws of Poker</p>
+                   <h3 className="text-xl font-black text-white uppercase tracking-tight">How to Play Poker</h3>
+                   <p className="text-xs text-slate-500 font-semibold tracking-wide">Official PokerOrg Professional Guide</p>
                  </div>
                </div>
                <button onClick={() => setShowRules(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
@@ -635,46 +635,65 @@ export default function Home() {
             {/* Modal Body */}
             <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto text-slate-300 leading-relaxed custom-scrollbar">
                <section>
-                 <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Basics of Poker</h4>
-                 <p className="text-sm">Today, Poker is truly an international game, enjoyed in virtually every country where card games are played. The game requires incredibly great skill, and each player is the master of his own fate.</p>
+                 <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Quick-Start Texas Hold'em</h4>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2 text-xs">
+                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">1.</span> Each player gets two hole cards face-down.</p>
+                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">2.</span> Three communal cards are dealt face-up ('The Flop').</p>
+                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">3.</span> One more communal card is dealt ('The Turn').</p>
+                    </div>
+                    <div className="space-y-2 text-xs">
+                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">4.</span> A final communal card is dealt ('The River').</p>
+                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">5.</span> Remaining players reveal best 5-card hand ('Showdown').</p>
+                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">6.</span> Strongest hand wins the pot!</p>
+                    </div>
+                 </div>
                </section>
 
                <section className="bg-white/5 p-4 rounded-2xl border border-white/10">
-                 <h4 className="text-white font-bold mb-3 flex items-center"><Coins className="w-4 h-4 mr-2 text-emerald-400" /> Hand Rankings (Highest to Lowest)</h4>
-                 <ul className="space-y-2 text-xs">
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-emerald-400 font-bold">1. Royal Flush</span> <span>A, K, Q, J, 10 of same suit</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">2. Straight Flush</span> <span>Five in sequence, same suit</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">3. Four of a Kind</span> <span>Four cards of one rank</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">4. Full House</span> <span>Three of one rank, pair of another</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">5. Flush</span> <span>Five cards of the same suit</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">6. Straight</span> <span>Five cards in sequence</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">7. Three of a Kind</span> <span>Three cards of same rank</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">8. Two Pairs</span> <span>Two different pairs</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">9. One Pair</span> <span>One pair of same rank</span></li>
-                   <li className="flex justify-between"><span className="text-slate-500 font-bold">10. No Pair</span> <span>High card determines winner</span></li>
+                 <h4 className="text-white font-bold mb-3 flex items-center"><Coins className="w-4 h-4 mr-2 text-amber-400" /> Hand Rankings (Hierarchy)</h4>
+                 <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-[10px]">
+                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-emerald-400 font-bold">1. Royal Flush</span> <span>A,K,Q,J,10 (Same Suit)</span></li>
+                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">2. Straight Flush</span> <span>5 Sequence, Same Suit</span></li>
+                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">3. Four of a Kind</span> <span>4 Cards of one rank</span></li>
+                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">4. Full House</span> <span>3 Rank + 2 Rank</span></li>
+                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">5. Flush</span> <span>5 of Same Suit</span></li>
+                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">6. Straight</span> <span>5 in Sequence</span></li>
+                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">7. Three of a Kind</span> <span>3 of Same Rank</span></li>
+                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">8. Two Pairs</span> <span>2 Different Pairs</span></li>
+                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">9. One Pair</span> <span>2 of Same Rank</span></li>
+                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-slate-500 font-bold">10. High Card</span> <span>Highest Card Wins</span></li>
                  </ul>
                </section>
 
                <section>
-                 <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Betting Interval</h4>
-                 <p className="text-sm">Betting is the key to Poker, for the game, in essence, is a game of chip management. Minimizing losses with poor hands and maximizing winnings with good hands is the underlying skill.</p>
-                 <div className="grid grid-cols-2 gap-4 mt-4 text-xs italic opacity-80">
-                   <div className="bg-slate-800 p-3 rounded-xl border border-white/5"><strong>CALL:</strong> To match the current highest bet.</div>
-                   <div className="bg-slate-800 p-3 rounded-xl border border-white/5"><strong>RAISE:</strong> Putting in more than enough to call.</div>
-                   <div className="bg-slate-800 p-3 rounded-xl border border-white/5"><strong>CHECK:</strong> To bet nothing (only if no prior bet).</div>
-                   <div className="bg-slate-800 p-3 rounded-xl border border-white/5"><strong>FOLD:</strong> Drop out of the current hand.</div>
+                 <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Professional Strategy</h4>
+                 <div className="space-y-4">
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                       <h5 className="text-white font-bold text-xs mb-1">Rule of 4 and 2</h5>
+                       <p className="text-[11px] opacity-70">Count your 'outs' (cards you need). Multiply by 4 on the flop (2 cards to come) or by 2 on the turn (1 card to come) to get your % chance to win.</p>
+                    </div>
+                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                       <h5 className="text-white font-bold text-xs mb-1">Understanding Position</h5>
+                       <p className="text-[11px] opacity-70">Acting after others gives you more information. Having 'position' is a massive strategic advantage in Texas Hold'em.</p>
+                    </div>
                  </div>
                </section>
 
                <section>
-                 <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Table Stakes</h4>
-                 <p className="text-sm text-slate-400">The limit for each player is the number of chips the player has in front of them. No player may withdraw chips from the table until they leave the game.</p>
+                 <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Betting Options</h4>
+                 <div className="grid grid-cols-2 gap-3 text-[11px]">
+                   <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>CALL:</strong> Match the current bet.</div>
+                   <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>RAISE:</strong> Increase the current bet.</div>
+                   <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>CHECK:</strong> Pass turn (if no prior bet).</div>
+                   <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>FOLD:</strong> Exit the current hand.</div>
+                 </div>
                </section>
             </div>
 
             {/* Modal Footer */}
             <div className="p-6 bg-black/20 border-t border-white/5 flex justify-center text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">
-               Courtesy of Bicycle® Cards • PokerX Engine
+               Courtesy of Poker.org Professional Standards
             </div>
           </div>
         </div>

@@ -21,12 +21,12 @@ export const Table = ({ gameState, playerId, onAction }: TableProps) => {
 
   // Predefined positions for 6 players (vertical oval layout optimized for mobile)
   const positions = [
-    "bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2", // self/bottom
-    "bottom-[22%] -left-2 sm:-left-12 translate-y-4", // bottom left
-    "top-[22%] -left-2 sm:-left-12 -translate-y-4", // top left
-    "top-0 -translate-y-1/2 left-1/2 -translate-x-1/2", // top
-    "top-[22%] -right-2 sm:-right-12 -translate-y-4", // top right
-    "bottom-[22%] -right-2 sm:-right-12 translate-y-4", // bottom right
+    "bottom-[-5%] left-1/2 -translate-x-1/2", // self/bottom (further out)
+    "bottom-[18%] -left-4 sm:-left-14 translate-y-4", // bottom left
+    "top-[18%] -left-4 sm:-left-14 -translate-y-4", // top left
+    "top-[-5%] left-1/2 -translate-x-1/2", // top (further out)
+    "top-[18%] -right-4 sm:-right-14 -translate-y-4", // top right
+    "bottom-[18%] -right-4 sm:-right-14 translate-y-4", // bottom right
   ];
 
   // Rotate players so current user is at bottom (index 0)
@@ -53,32 +53,25 @@ export const Table = ({ gameState, playerId, onAction }: TableProps) => {
   }, [isMyTurn, minRaiseTo]);
 
   return (
-    <div className="relative w-full max-w-[360px] sm:max-w-4xl mx-auto h-[580px] sm:h-[800px] flex items-center justify-center p-2 sm:p-12 mt-8 sm:mt-0 select-none touch-none">
+    <div className="relative w-full max-w-[400px] sm:max-w-4xl mx-auto h-[620px] sm:h-[800px] flex items-center justify-center p-6 sm:p-20 mt-4 sm:mt-0 select-none touch-none">
       
       {/* Table Background */}
       <div className="absolute inset-0 sm:inset-12 bg-gradient-to-b from-[#1c7e4b] to-[#0d3f23] rounded-[160px] sm:rounded-[200px] shadow-[inset_0_10px_60px_rgba(0,0,0,0.8),_0_15px_40px_rgba(0,0,0,0.6)] border-[10px] sm:border-[24px] border-[#181a20] flex items-center justify-center">
         
-        {/* Casino Felt Pattern / Branding */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none overflow-hidden rounded-[160px] sm:rounded-[200px]">
-           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[120px] sm:text-[200px] font-black italic text-white/20 select-none">POKERX</div>
-           <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 gap-12 opacity-40">
-              {Array.from({ length: 64 }).map((_, i) => (
-                <div key={i} className="w-1 h-1 bg-white/10 rounded-full rotate-45 transform translate-x-4 translate-y-4" />
-              ))}
-           </div>
-        </div>
+        {/* Table Felt Enhancements */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+        <div className="absolute inset-[10%] rounded-[180px] sm:rounded-[220px] border border-white/10 shadow-[inset_0_0_100px_rgba(0,0,0,0.4)] pointer-events-none"></div>
 
-        {/* Inner Table Ring */}
-        <div className="absolute inset-[6%] rounded-[160px] sm:rounded-[200px] border-2 border-[#2a9c60]/40 shadow-[0_0_50px_rgba(42,156,96,0.1)] pointer-events-none"></div>
-
-        {/* Table Logo / Center Text */}
-        <div className="absolute bottom-[22%] text-center pointer-events-none flex flex-col items-center">
-          <div className="text-[10px] md:text-sm font-semibold tracking-wider text-white/30 uppercase italic">
-            {gameState.settings?.smallBlind || 10}/{ (gameState.settings?.smallBlind || 10) * 2 } - Hold'em
+        {/* Table Logo & Ticker */}
+        <div className="absolute bottom-[22%] w-full flex flex-col items-center pointer-events-none transition-all">
+          <div className="flex items-center space-x-2 bg-black/40 px-4 py-1.5 rounded-full border border-white/5 backdrop-blur-sm shadow-xl">
+             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+             <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">
+                {gameState.logs?.[gameState.logs.length - 1]?.message || "New Session Started"}
+             </span>
           </div>
-          <div className="text-[9px] md:text-xs font-bold tracking-widest text-[#2a9c60] mt-1 shadow-inner px-4 p-1 rounded-full bg-black/20 uppercase flex items-center space-x-1">
-            <span className="opacity-50 text-[8px]">★</span>
-            <span>Rank {gameState.players.length}</span>
+          <div className="mt-4 text-center opacity-5">
+             <h2 className="text-6xl sm:text-9xl font-black tracking-tighter text-white">POKERX</h2>
           </div>
         </div>
 
@@ -87,16 +80,17 @@ export const Table = ({ gameState, playerId, onAction }: TableProps) => {
           
           <div className="mb-6 z-20">
              <div className="relative group cursor-default">
-                <div className="absolute -inset-4 bg-amber-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-                <div className="bg-black/60 backdrop-blur-md px-6 py-3 rounded-full border-2 border-amber-500/50 shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center space-x-3 transition-transform hover:scale-110">
-                   <div className="flex -space-x-1">
-                      <div className="w-4 h-4 rounded-full bg-red-600 border border-white/20 shadow-sm animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-4 h-4 rounded-full bg-blue-600 border border-white/20 shadow-sm animate-bounce" style={{ animationDelay: '200ms' }}></div>
-                      <div className="w-4 h-4 rounded-full bg-slate-100 border border-black/20 shadow-sm animate-bounce" style={{ animationDelay: '400ms' }}></div>
+                <div className="absolute -inset-10 bg-amber-500/10 blur-2xl rounded-full animate-pulse"></div>
+                <div className="bg-[#1a1b26]/90 backdrop-blur-xl px-8 py-4 rounded-[32px] border-2 border-amber-500/30 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex items-center space-x-5 transition-transform hover:scale-105">
+                   {/* 3D Chip Stack Animation */}
+                   <div className="relative w-10 h-10">
+                      <div className="absolute bottom-0 left-0 w-8 h-8 rounded-full bg-red-600 border-2 border-white/20 shadow-md"></div>
+                      <div className="absolute bottom-1 left-0 w-8 h-8 rounded-full bg-blue-600 border-2 border-white/20 shadow-md"></div>
+                      <div className="absolute bottom-2 left-0 w-8 h-8 rounded-full bg-slate-100 border-2 border-black/10 shadow-md flex items-center justify-center font-black text-[8px] text-black italic">PX</div>
                    </div>
-                   <div className="flex flex-col items-start leading-none pt-0.5">
-                      <span className="text-[9px] font-black text-amber-500/60 uppercase tracking-tighter">Total Pot</span>
-                      <span className="text-xl font-black text-white tracking-tight">${gameState.pot}</span>
+                   <div className="flex flex-col items-start pt-1">
+                      <span className="text-[10px] font-black text-amber-500/40 uppercase tracking-[0.2em]">Current Pot</span>
+                      <span className="text-3xl font-black text-white tracking-tighter">${gameState.pot}</span>
                    </div>
                 </div>
              </div>
@@ -104,13 +98,13 @@ export const Table = ({ gameState, playerId, onAction }: TableProps) => {
           
           <div className="flex -space-x-2 md:space-x-2 relative z-10">
             {(gameState.communityCards || []).map((card, i) => (
-              <div key={i} className="animate-in slide-in-from-top-4 fade-in duration-500" style={{ animationDelay: `${i * 100}ms` }}>
-                <CardView card={card} className="md:scale-100" />
+              <div key={i} className="animate-in slide-in-from-top-4 fade-in duration-500 scale-[0.8] sm:scale-100" style={{ animationDelay: `${i * 100}ms` }}>
+                <CardView card={card} />
               </div>
             ))}
             {/* Empty slots */}
             {Array.from({ length: 5 - (gameState.communityCards?.length || 0) }).map((_, i) => (
-              <div key={`empty-${i}`} className="w-14 h-20 md:w-16 md:h-24 border border-white/10 rounded-lg bg-black/10" />
+              <div key={`empty-${i}`} className="w-10 h-14 md:w-16 md:h-24 border border-white/10 rounded-lg bg-black/10 scale-[0.8] sm:scale-100" />
             ))}
           </div>
 
