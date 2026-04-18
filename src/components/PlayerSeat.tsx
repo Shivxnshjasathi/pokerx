@@ -51,7 +51,7 @@ export const PlayerSeat = memo(({
       {/* Cards Display */}
       <div className={cn(
         "relative z-30 pointer-events-none flex transition-all duration-500",
-        "-mb-6 scale-[0.85] sm:scale-100 -space-x-10"
+        "-mb-6 scale-[0.85] sm:scale-100 -space-x-6"
       )}>
         {player.cards.length > 0 ? player.cards.map((card, i) => (
           <CardView 
@@ -60,15 +60,15 @@ export const PlayerSeat = memo(({
              hidden={!isSelf && !showCards} 
              className={cn(
                 "shadow-xl border-white/20 transition-all duration-500",
-                i === 0 ? "-rotate-6" : "rotate-6"
+                i === 0 ? "-rotate-10" : "rotate-10"
              )} 
           />
         )) : (
            <>
-              <div className="w-12 h-16 sm:w-14 sm:h-20 bg-blue-600 rounded-lg border-2 border-white shadow-xl -rotate-6 flex items-center justify-center overflow-hidden">
+              <div className="w-12 h-16 sm:w-14 sm:h-20 bg-blue-600 rounded-lg border-2 border-white shadow-xl -rotate-10 flex items-center justify-center overflow-hidden">
                 <div className="w-full h-full opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
               </div>
-              <div className="w-12 h-16 sm:w-14 sm:h-20 bg-blue-600 rounded-lg border-2 border-white shadow-xl rotate-6 flex items-center justify-center overflow-hidden">
+              <div className="w-12 h-16 sm:w-14 sm:h-20 bg-blue-600 rounded-lg border-2 border-white shadow-xl rotate-10 flex items-center justify-center overflow-hidden">
                 <div className="w-full h-full opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
               </div>
            </>
