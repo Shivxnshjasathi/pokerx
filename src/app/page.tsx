@@ -502,8 +502,18 @@ export default function Home() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-white/90">POKER</span>
             <span className="text-emerald-500">X</span>
           </div>
-          <div className="hidden md:flex items-center px-3 py-1 bg-white/5 border border-white/10 rounded-full">
-            <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">Pro Table • #{tableId}</span>
+          <div 
+            onClick={() => {
+              if (tableId) {
+                navigator.clipboard.writeText(tableId);
+                alert(`Room code ${tableId} copied!`);
+              }
+            }}
+            className="flex items-center px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full cursor-pointer hover:bg-emerald-500/20 transition-all active:scale-95 group"
+          >
+            <span className="text-[8px] sm:text-[10px] font-black tracking-[0.2em] text-emerald-500 uppercase">
+              Table #{tableId}
+            </span>
           </div>
         </div>
 
