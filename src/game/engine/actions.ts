@@ -89,7 +89,12 @@ export const applyAction = (state: GameState, action: Action): GameState => {
       break;
   }
 
-  return calculateNextTurn(newState);
+  const processedState = calculateNextTurn(newState);
+  if (processedState.currentTurnIndex !== state.currentTurnIndex || processedState.round !== state.round) {
+    processedState.turnStartedAt = Date.now();
+  }
+  processedState.lastActivity = Date.now();
+  return processedState;
 };
 
 export const calculateNextTurn = (state: GameState): GameState => {
@@ -122,5 +127,6 @@ export const calculateNextTurn = (state: GameState): GameState => {
   }
 
   state.currentTurnIndex = nextIdx;
+  state.turnStartedAt = Date.now();
   return state;
 };

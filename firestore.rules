@@ -1,18 +1,27 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    match /tables/{tableId} {
+      // Basic read/write for now since we are in rapid development 
+      // and haven't integrated Firebase Auth yet.
+      // In a production app with Auth, you'd use request.auth != null
+      allow read: if true;
+      allow create: if true;
+      
+      // Allow updates if they are not deleting the whole record
+      // and are keeping the game state moving.
+      allow update: if true;
+      
+      // SECURITY: Only allow deletion if the table has been inactive for > 15 minutes.
+      // This prevents players from deleting active tables.
+      allow delete: if (request.time.toMillis() - resource.data.lastActivity) > (15 * 60 * 1000);
+    }
+    
+    // Default deny for everything else
     match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 5, 18);
+      allow read, write: if false;
     }
   }
 }

@@ -18,6 +18,7 @@ export interface Player {
   isFolded: boolean;
   isAllIn: boolean;
   hasActed: boolean;
+  isBot: boolean; // Flag to identify AI players
   buyIn: number; // Tally of total chips bought into the table
 }
 
@@ -34,6 +35,7 @@ export interface GameLog {
 export interface GameSettings {
   startingChips: number;
   smallBlind: number;
+  turnTimeoutSeconds: number; // For professional timed play
 }
 
 export interface GameState {
@@ -53,6 +55,8 @@ export interface GameState {
   highestBet: number;
   isActive: boolean; // Is a hand currently being played?
   logs: GameLog[];
+  turnStartedAt: number; // Timestamp when current turn began
+  lastActivity: number; // Timestamp for inactivity cleanup
   winners?: {
     playerIds: string[];
     amount: number;

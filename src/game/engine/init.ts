@@ -44,7 +44,9 @@ export const initGame = (id: string, players: Player[], settings: any): GameStat
     minRaise: smallBlindAmount * 2,
     highestBet: 0,
     isActive: true,
-    logs: [{ message: 'Game started', timestamp: Date.now() }]
+    logs: [{ message: 'Game started', timestamp: Date.now() }],
+    turnStartedAt: Date.now(),
+    lastActivity: Date.now()
   };
 
   // Post blinds
