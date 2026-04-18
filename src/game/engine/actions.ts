@@ -13,6 +13,7 @@ export const applyAction = (state: GameState, action: Action): GameState => {
     p.chips += amount;
     p.buyIn += amount;
     newState.logs.push({ message: `${p.name} topped up ${amount}`, timestamp: Date.now() });
+    newState.lastActivity = Date.now();
     return newState;
   }
 

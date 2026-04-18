@@ -1,18 +1,32 @@
 import { Card, GameState, Player } from '../types';
 import { createDeck, shuffleDeck } from './deck';
 
-export const initGame = (id: string, players: Player[], settings: any): GameState => {
+export const initGame = (id: string, players: Player[], settings: any, prevDealerIndex?: number): GameState => {
   const smallBlindAmount = settings?.smallBlind || 10;
-  const activePlayers = players.filter(p => !p.isFolded);
-  if (activePlayers.length < 2) {
-    throw new Error("Need at least 2 players to start a game");
+  
+  // Clean players for new hand
+  const newPlayers = players.map(p => ({ ...p, cards: [] as Card[], currentBet: 0, totalContribution: 0, isFolded: p.chips <= 0, isAllIn: false, hasActed: false }));
+  
+  const activePlayersCount = newPlayers.filter(p => !p.isFolded).length;
+  if (activePlayersCount < 2) {
+    throw new Error("Need at least 2 players with chips to start a game");
   }
 
   let deck = shuffleDeck(createDeck());
   
-  // Deal hole cards
-  const newPlayers = players.map(p => ({ ...p, cards: [] as Card[], currentBet: 0, totalContribution: 0, isFolded: p.chips <= 0, isAllIn: false, hasActed: false }));
+  // Determine dealer index
+  let dealerIndex = typeof prevDealerIndex === 'number' 
+    ? (prevDealerIndex + 1) % newPlayers.length 
+    : 0;
   
+  // Skip folded players (out of chips) for dealer button
+  let loops = 0;
+  while (newPlayers[dealerIndex].isFolded && loops < newPlayers.length) {
+    dealerIndex = (dealerIndex + 1) % newPlayers.length;
+    loops++;
+  }
+
+  // Deal hole cards
   for (let i = 0; i < 2; i++) {
     newPlayers.forEach(p => {
       if (!p.isFolded) {
@@ -21,12 +35,14 @@ export const initGame = (id: string, players: Player[], settings: any): GameStat
     });
   }
 
-  // Determine dealer, SB, BB for simplicity, dealer is 0 if not set, next is SB, next is BB
-  // In a real game, dealer button rotates.
-  const dealerIndex = 0; // TODO: rotating dealer
-  const smallBlindIndex = (dealerIndex + 1) % newPlayers.length;
-  // If 2 players, dealer is SB and other is BB
-  const bigBlindIndex = newPlayers.length === 2 ? (dealerIndex + 0) % newPlayers.length : (dealerIndex + 2) % newPlayers.length;
+  // Blinds calculation
+  const smallBlindIndex = activePlayersCount === 2 
+    ? dealerIndex 
+    : (dealerIndex + 1) % newPlayers.length;
+  
+  const bigBlindIndex = activePlayersCount === 2
+    ? (dealerIndex + 1) % newPlayers.length
+    : (dealerIndex + 2) % newPlayers.length;
 
   let state: GameState = {
     id,
@@ -36,15 +52,15 @@ export const initGame = (id: string, players: Player[], settings: any): GameStat
     players: newPlayers,
     pot: 0,
     sidePots: [],
-    currentTurnIndex: 0, // Set after blinds
+    currentTurnIndex: 0,
     dealerIndex,
     smallBlindIndex,
-    bigBlindIndex: newPlayers.length === 2 ? 1 : bigBlindIndex,
+    bigBlindIndex,
     round: 'preflop',
     minRaise: smallBlindAmount * 2,
     highestBet: 0,
     isActive: true,
-    logs: [{ message: 'Game started', timestamp: Date.now() }],
+    logs: [{ message: 'New Hand Started', timestamp: Date.now() }],
     turnStartedAt: Date.now(),
     lastActivity: Date.now()
   };
@@ -52,10 +68,16 @@ export const initGame = (id: string, players: Player[], settings: any): GameStat
   // Post blinds
   state = postBlinds(state, smallBlindAmount);
 
-  // Set current turn to player after BB
+  // Set current turn to player after BB (or dealer in heads-up)
   let turnIdx = (state.bigBlindIndex + 1) % state.players.length;
-  while (state.players[turnIdx].isFolded || state.players[turnIdx].isAllIn) {
+  if (activePlayersCount === 2) {
+    turnIdx = state.dealerIndex;
+  }
+
+  let safety = 0;
+  while ((state.players[turnIdx].isFolded || state.players[turnIdx].isAllIn) && safety < state.players.length) {
     turnIdx = (turnIdx + 1) % state.players.length;
+    safety++;
   }
   state.currentTurnIndex = turnIdx;
 

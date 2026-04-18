@@ -17,7 +17,17 @@ export const metadata: Metadata = {
   description: "A premium, real-time multiplayer poker experience.",
   icons: {
     icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
   }
+};
+
+export const viewport = {
+  themeColor: "#06070a",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

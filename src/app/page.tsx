@@ -30,10 +30,10 @@ export default function Home() {
     }
     const derivedTableId = Math.random().toString(36).substring(2, 8).toUpperCase();
     setTableId(derivedTableId);
-    
+
     // Fallback if crypto.randomUUID is not available (e.g., local network testing over HTTP)
     const newPlayerId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
-    
+
     setMyPlayerId(newPlayerId);
     setInGame(true);
 
@@ -78,7 +78,7 @@ export default function Home() {
         lastActivity: Date.now(),
         logs: [{ message: `Table created by ${playerName}`, timestamp: Date.now() }]
       });
-    } catch(e: any) {
+    } catch (e: any) {
       console.error(e);
       alert(e.message);
     }
@@ -93,26 +93,26 @@ export default function Home() {
     try {
       const ref = doc(db, 'tables', tableId);
       const snap = await getDoc(ref);
-      
+
       let finalStartingChips = 1000;
       let finalSettings: GameSettings = { startingChips: 1000, smallBlind: 10, turnTimeoutSeconds: 15 };
-      
-      if (snap.exists()) {
-         const data = snap.data();
-         
-         // Inactivity Check (15 minutes = 900,000ms)
-         const fifteenMins = 15 * 60 * 1000;
-         if (data.lastActivity && (Date.now() - data.lastActivity > fifteenMins)) {
-           await deleteDoc(ref);
-           alert("This table has expired due to 15 minutes of inactivity and has been deleted. Please create a new one.");
-           setInGame(false);
-           return;
-         }
 
-         if (data.settings && data.settings.startingChips) {
-            finalStartingChips = data.settings.startingChips;
-            finalSettings = data.settings;
-         }
+      if (snap.exists()) {
+        const data = snap.data();
+
+        // Inactivity Check (15 minutes = 900,000ms)
+        const fifteenMins = 15 * 60 * 1000;
+        if (data.lastActivity && (Date.now() - data.lastActivity > fifteenMins)) {
+          await deleteDoc(ref);
+          alert("This table has expired due to 15 minutes of inactivity and has been deleted. Please create a new one.");
+          setInGame(false);
+          return;
+        }
+
+        if (data.settings && data.settings.startingChips) {
+          finalStartingChips = data.settings.startingChips;
+          finalSettings = data.settings;
+        }
       }
 
       const newPlayer: Player = {
@@ -164,9 +164,9 @@ export default function Home() {
       return;
     }
     try {
-      const newState = initGame(tableId, gameState.players as Player[], gameState.settings);
+      const newState = initGame(tableId, gameState.players as Player[], gameState.settings, gameState.dealerIndex);
       await setDoc(doc(db, 'tables', tableId), newState);
-    } catch(e: any) {
+    } catch (e: any) {
       alert(e.message);
     }
   };
@@ -209,11 +209,11 @@ export default function Home() {
     const name = playerName || "ProPlayer";
     const id = Math.random().toString(36).substr(2, 6).toUpperCase();
     const myId = "player_" + Math.random().toString(36).substr(2, 9);
-    
+
     // Create Table
     setTableId(id);
     setMyPlayerId(myId);
-    
+
     const settings: GameSettings = {
       startingChips: 1000,
       smallBlind: 10,
@@ -253,7 +253,7 @@ export default function Home() {
       await setDoc(doc(db, 'tables', id), {
         id,
         settings,
-        deck: [], 
+        deck: [],
         communityCards: [],
         pot: 0,
         sidePots: [],
@@ -288,8 +288,8 @@ export default function Home() {
 
     // Small delay to make it feel human
     const timer = setTimeout(() => {
-        const action = getBotAction(gameState, currentPlayer.id);
-        sendAction(action);
+      const action = getBotAction(gameState, currentPlayer.id);
+      sendAction(action);
     }, 1500 + Math.random() * 2000);
 
     return () => clearTimeout(timer);
@@ -316,7 +316,7 @@ export default function Home() {
   // Auto-action logic for turn timeout
   useEffect(() => {
     if (!gameState || !gameState.isActive || !myPlayerId) return;
-    
+
     const currentPlayer = gameState.players[gameState.currentTurnIndex];
     if (currentPlayer.id !== myPlayerId) return;
 
@@ -345,37 +345,47 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [gameState?.currentTurnIndex, gameState?.turnStartedAt, myPlayerId]);
 
+  // Clean exit if table is deleted
+  useEffect(() => {
+    if (inGame && !loading && !gameState && tableId) {
+      setInGame(false);
+      setMyPlayerId('');
+      setTableId('');
+      alert("This table has been closed or expired.");
+    }
+  }, [inGame, loading, gameState, tableId]);
+
   if (!inGame) {
     return (
       <div className="min-h-screen bg-[#06070a] flex flex-col items-center justify-center p-4 overflow-hidden relative">
         {/* Animated Background Depth */}
         <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-emerald-600/10 rounded-full blur-[160px] animate-pulse"></div>
         <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[160px] animate-pulse delay-1000"></div>
-        
+
         {/* Floating Decoration Cards (Visual Only) */}
         <div className="absolute top-10 left-[15%] opacity-20 rotate-12 animate-float pointer-events-none hidden md:block">
-           <div className="w-24 h-36 border-4 border-white/10 rounded-2xl bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm self-center justify-center flex items-center text-4xl">♠️</div>
+          <div className="w-24 h-36 border-4 border-white/10 rounded-2xl bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm self-center justify-center flex items-center text-4xl">♠️</div>
         </div>
         <div className="absolute bottom-20 right-[15%] opacity-20 -rotate-12 animate-float delay-700 pointer-events-none hidden md:block">
-           <div className="w-24 h-36 border-4 border-white/10 rounded-2xl bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm self-center justify-center flex items-center text-4xl text-red-500">♥️</div>
+          <div className="w-24 h-36 border-4 border-white/10 rounded-2xl bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm self-center justify-center flex items-center text-4xl text-red-500">♥️</div>
         </div>
 
-        <div className="bg-[#111218]/90 backdrop-blur-3xl p-10 rounded-[48px] w-full max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)] border border-white/[0.05] space-y-10 z-10 scale-in animate-in zoom-in-95 duration-700">
-          <div className="text-center space-y-3">
+        <div className="bg-[#111218]/90 backdrop-blur-3xl p-6 sm:p-10 rounded-[32px] sm:rounded-[48px] w-full max-w-md shadow-[0_40px_100px_rgba(0,0,0,0.8)] border border-white/[0.05] space-y-8 sm:space-y-10 z-10 scale-in animate-in zoom-in-95 duration-700">
+          <div className="text-center space-y-2 sm:space-y-3">
             <div className="relative inline-block group">
               <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-emerald-700 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-              <h1 className="relative text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-emerald-400 to-emerald-600 tracking-tighter filter drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]">
+              <h1 className="relative text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-emerald-400 to-emerald-600 tracking-tighter filter drop-shadow-[0_0_20px_rgba(16,185,129,0.5)]">
                 POKERX
               </h1>
             </div>
-            <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Elite Multiplayer Hold'em</p>
+            <p className="text-slate-500 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] opacity-40">Elite Multiplayer Hold'em</p>
           </div>
-          
+
           <div className="space-y-6">
             <div className="group relative">
               <label className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2 block ml-1 text-left group-focus-within:text-emerald-400 transition-colors">Player Identity</label>
               <div className="relative">
-                 <input 
+                <input
                   className="w-full bg-black/60 border border-white/[0.03] rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 outline-none transition-all placeholder:text-slate-800 font-medium text-lg"
                   value={playerName}
                   onChange={e => setPlayerName(e.target.value)}
@@ -384,9 +394,9 @@ export default function Home() {
               </div>
             </div>
 
-             <div className="group relative">
+            <div className="group relative">
               <label className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2 block ml-1 text-left group-focus-within:text-emerald-400 transition-colors">Access Code <span className="opacity-30">(Join)</span></label>
-              <input 
+              <input
                 className="w-full bg-black/60 border border-white/[0.03] rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 outline-none transition-all placeholder:text-slate-800 font-mono tracking-widest text-lg"
                 value={tableId}
                 onChange={e => setTableId(e.target.value.toUpperCase())}
@@ -398,7 +408,7 @@ export default function Home() {
               <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                 <div className="group">
                   <label className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2 block ml-1 text-left">Buy-in</label>
-                  <input 
+                  <input
                     type="number"
                     className="w-full bg-black/60 border border-white/[0.03] rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-emerald-500/30 outline-none transition-all font-mono"
                     value={startingChips}
@@ -407,7 +417,7 @@ export default function Home() {
                 </div>
                 <div className="group">
                   <label className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2 block ml-1 text-left">Turn (s)</label>
-                  <input 
+                  <input
                     type="number"
                     className="w-full bg-black/60 border border-white/[0.03] rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-emerald-500/30 outline-none transition-all font-mono"
                     value={turnTimeout}
@@ -416,9 +426,9 @@ export default function Home() {
                 </div>
               </div>
             )}
-            
+
             <div className="flex flex-col space-y-4 pt-4">
-              <button 
+              <button
                 onClick={joinTable}
                 className="w-full group bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.05] text-white font-bold py-5 rounded-2xl transition-all flex items-center justify-center space-x-3 active:scale-[0.98] relative overflow-hidden"
               >
@@ -426,7 +436,7 @@ export default function Home() {
                 <UserPlus className="w-5 h-5 text-emerald-400" />
                 <span className="tracking-wide">Join Game</span>
               </button>
-              
+
               <div className="relative flex py-3 items-center">
                 <div className="flex-grow border-t border-white/[0.03]"></div>
                 <span className="flex-shrink-0 mx-6 text-slate-800 text-[9px] font-black tracking-[0.5em] italic">CREATE SESSION</span>
@@ -434,17 +444,17 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-1 gap-3">
-                <button 
+                <button
                   onClick={createTable}
-                  className="w-full bg-gradient-to-br from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 text-white font-black py-5 rounded-2xl transition-all shadow-[0_20px_40px_-15px_rgba(16,185,129,0.4)] active:scale-[0.98] flex items-center justify-center space-x-3 uppercase tracking-widest text-sm"
+                  className="w-full bg-gradient-to-br from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 text-white font-black py-4 sm:py-5 rounded-2xl transition-all shadow-[0_20px_40px_-15px_rgba(16,185,129,0.4)] active:scale-[0.98] flex items-center justify-center space-x-3 uppercase tracking-widest text-xs sm:text-sm"
                 >
                   <PlusCircle className="w-5 h-5" />
                   <span>Private Table</span>
                 </button>
 
-                <button 
+                <button
                   onClick={startSoloGame}
-                  className="w-full bg-gradient-to-br from-indigo-500 to-purple-700 hover:from-indigo-400 hover:to-purple-600 text-white font-black py-5 rounded-2xl transition-all shadow-[0_20px_40px_-15px_rgba(79,70,229,0.4)] active:scale-[0.98] flex items-center justify-center space-x-3 uppercase tracking-widest text-sm border border-white/10"
+                  className="w-full bg-gradient-to-br from-indigo-500 to-purple-700 hover:from-indigo-400 hover:to-purple-600 text-white font-black py-4 sm:py-5 rounded-2xl transition-all shadow-[0_20px_40px_-15px_rgba(79,70,229,0.4)] active:scale-[0.98] flex items-center justify-center space-x-3 uppercase tracking-widest text-xs sm:text-sm border border-white/10"
                 >
                   <Bot className="w-5 h-5" />
                   <span>Play vs AI</span>
@@ -460,69 +470,69 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#21113c] via-[#100624] to-[#0a0216] font-sans text-slate-200 overflow-hidden">
       {/* Header */}
-      <header className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex justify-between items-center z-50">
+      <header className="absolute top-0 left-0 right-0 p-3 sm:p-6 flex justify-between items-center z-50 bg-gradient-to-b from-black/40 to-transparent">
         <div className="text-xl sm:text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">
-          POKERX <span className="text-slate-500 text-xs sm:text-sm ml-1 sm:ml-2 font-semibold">[{tableId}]</span>
+          POKERX <span className="text-slate-500 text-[10px] sm:text-sm ml-1 sm:ml-2 font-semibold tracking-widest">[{tableId}]</span>
         </div>
-        
+
         {/* Actions / status */}
         <div className="flex space-x-2 sm:space-x-4 items-center">
           {gameState && (
-            <button 
+            <button
               onClick={() => {
                 const amount = prompt("Top up amount (adds to your current stack):", "1000");
                 if (amount && parseInt(amount) > 0) {
-                   sendAction({ playerId: myPlayerId, type: 'top-up', amount: parseInt(amount) });
+                  sendAction({ playerId: myPlayerId, type: 'top-up', amount: parseInt(amount) });
                 }
               }}
               className="bg-slate-800/80 hover:bg-slate-700 text-white rounded-full p-2 sm:px-4 sm:py-2 border border-white/10 flex items-center space-x-1 transition-all"
             >
               <Wallet className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs sm:text-sm font-bold hidden sm:block">Top Up</span>
+              <span className="text-[10px] sm:text-sm font-bold hidden xs:block">Top Up</span>
             </button>
           )}
 
           {gameState && (
-            <button 
+            <button
               onClick={() => setShowLedger(true)}
               className="bg-slate-800/80 hover:bg-slate-700 text-white rounded-full p-2 sm:px-4 sm:py-2 border border-white/10 flex items-center space-x-1 transition-all"
             >
               <TrendingUp className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs sm:text-sm font-bold hidden sm:block">Ledger</span>
+              <span className="text-[10px] sm:text-sm font-bold hidden xs:block">Ledger</span>
             </button>
           )}
 
           {gameState && (
-            <button 
+            <button
               onClick={() => setShowRules(true)}
               className="bg-slate-800/80 hover:bg-slate-700 text-white rounded-full p-2 sm:px-4 sm:py-2 border border-white/10 flex items-center space-x-1 transition-all"
             >
               <Trophy className="w-4 h-4 text-amber-400" />
-              <span className="text-xs sm:text-sm font-bold hidden sm:block">Rules</span>
+              <span className="text-[10px] sm:text-sm font-bold hidden xs:block">Rules</span>
             </button>
           )}
 
           {gameState && !gameState.isActive && (
-            <button 
+            <button
               onClick={addBot}
               className="bg-slate-800/80 hover:bg-white/10 text-white rounded-full p-2 sm:px-4 sm:py-2 border border-white/10 flex items-center space-x-1 transition-all"
             >
               <Cpu className="w-4 h-4 text-purple-400" />
-              <span className="text-xs sm:text-sm font-bold hidden sm:block">Add Bot</span>
+              <span className="text-[10px] sm:text-sm font-bold hidden xs:block">Add Bot</span>
             </button>
           )}
 
           {gameState && !gameState.isActive && (
-             <button 
-               onClick={handleStartGame}
-               className="bg-amber-600 hover:bg-amber-500 text-white px-4 sm:px-6 py-2 rounded-lg font-bold flex items-center space-x-2 transition-all hover:shadow-[0_0_20px_rgba(217,119,6,0.5)] text-xs sm:text-sm"
-             >
-               <Play className="w-4 h-4" />
-               <span className="whitespace-nowrap">{gameState.round === 'showdown' ? 'Next Hand' : 'Start Game'}</span>
-             </button>
+            <button
+              onClick={handleStartGame}
+              className="bg-amber-600 hover:bg-amber-500 text-white px-4 sm:px-6 py-2 rounded-lg font-bold flex items-center space-x-2 transition-all hover:shadow-[0_0_20px_rgba(217,119,6,0.5)] text-xs sm:text-sm"
+            >
+              <Play className="w-4 h-4" />
+              <span className="whitespace-nowrap">{gameState.round === 'showdown' ? 'Next Hand' : 'Start Game'}</span>
+            </button>
           )}
 
-          <button 
+          <button
             onClick={leaveTable}
             className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 rounded-full p-2 border border-rose-500/20 transition-all"
             title="Leave Table"
@@ -556,57 +566,57 @@ export default function Home() {
 
       {/* Ledger Modal */}
       {showLedger && gameState && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-[#1a1b26] border border-white/10 rounded-[32px] w-full max-w-lg shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden scale-in animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-[#1a1b26] border-t sm:border border-white/10 rounded-t-[32px] sm:rounded-[32px] w-full max-w-lg shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden scale-in animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
             {/* Modal Header */}
             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-emerald-500/10 to-transparent">
-               <div className="flex items-center space-x-3">
-                 <div className="bg-emerald-500/20 p-2 rounded-xl">
-                   <Trophy className="w-5 h-5 text-emerald-400" />
-                 </div>
-                 <div>
-                   <h3 className="text-xl font-black text-white uppercase tracking-tight">Financial Ledger</h3>
-                   <p className="text-xs text-slate-500 font-semibold tracking-wide">Real-time Transaction Analysis</p>
-                 </div>
-               </div>
-               <button onClick={() => setShowLedger(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                 <X className="w-6 h-6 text-slate-400" />
-               </button>
+              <div className="flex items-center space-x-3">
+                <div className="bg-emerald-500/20 p-2 rounded-xl">
+                  <Trophy className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white uppercase tracking-tight">Financial Ledger</h3>
+                  <p className="text-xs text-slate-500 font-semibold tracking-wide">Real-time Transaction Analysis</p>
+                </div>
+              </div>
+              <button onClick={() => setShowLedger(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                <X className="w-6 h-6 text-slate-400" />
+              </button>
             </div>
 
             {/* Modal Body */}
             <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-               {gameState.players.map((p, idx) => {
-                 const profit = p.chips - p.buyIn;
-                 const isProfit = profit >= 0;
-                 return (
-                   <div key={p.id} className="bg-white/[0.03] border border-white/5 p-4 rounded-2xl flex items-center justify-between">
-                      <div className="flex items-center space-x-3 text-left">
-                        <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-white/10 text-xl">👤</div>
-                        <div>
-                          <div className="text-white font-bold text-sm tracking-wide">{p.name}</div>
-                          <div className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Buy-in: ${p.buyIn}</div>
-                        </div>
+              {gameState.players.map((p, idx) => {
+                const profit = p.chips - p.buyIn;
+                const isProfit = profit >= 0;
+                return (
+                  <div key={p.id} className="bg-white/[0.03] border border-white/5 p-4 rounded-2xl flex items-center justify-between">
+                    <div className="flex items-center space-x-3 text-left">
+                      <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-white/10 text-xl">👤</div>
+                      <div>
+                        <div className="text-white font-bold text-sm tracking-wide">{p.name}</div>
+                        <div className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Buy-in: ${p.buyIn}</div>
                       </div>
+                    </div>
 
-                      <div className="text-right">
-                        <div className="text-white font-black text-lg leading-tight">${p.chips}</div>
-                        <div className={cn(
-                          "flex items-center justify-end font-bold text-xs",
-                          isProfit ? "text-emerald-400" : "text-rose-400"
-                        )}>
-                          {isProfit ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
-                          {isProfit ? "+" : "-"}${Math.abs(profit)}
-                        </div>
+                    <div className="text-right">
+                      <div className="text-white font-black text-lg leading-tight">${p.chips}</div>
+                      <div className={cn(
+                        "flex items-center justify-end font-bold text-xs",
+                        isProfit ? "text-emerald-400" : "text-rose-400"
+                      )}>
+                        {isProfit ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
+                        {isProfit ? "+" : "-"}${Math.abs(profit)}
                       </div>
-                   </div>
-                 );
-               })}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Modal Footer */}
             <div className="p-6 bg-black/20 border-t border-white/5 flex justify-center text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">
-               System Version 1.0.4 • {gameState.id}
+              System Version 1.0.4 • {gameState.id}
             </div>
           </div>
         </div>
@@ -614,90 +624,97 @@ export default function Home() {
 
       {/* Rules Modal */}
       {showRules && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-[#1a1b26] border border-white/10 rounded-[32px] w-full max-w-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden scale-in animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-[#1a1b26] border-t sm:border border-white/10 rounded-t-[32px] sm:rounded-[32px] w-full max-w-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden scale-in animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 max-h-[95vh] flex flex-col">
             {/* Modal Header */}
             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-amber-500/10 to-transparent">
-               <div className="flex items-center space-x-3">
-                 <div className="bg-amber-500/20 p-2 rounded-xl">
-                   <Trophy className="w-5 h-5 text-amber-400" />
-                 </div>
-                 <div>
-                   <h3 className="text-xl font-black text-white uppercase tracking-tight">How to Play Poker</h3>
-                   <p className="text-xs text-slate-500 font-semibold tracking-wide">Official PokerOrg Professional Guide</p>
-                 </div>
-               </div>
-               <button onClick={() => setShowRules(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                 <X className="w-6 h-6 text-slate-400" />
-               </button>
+              <div className="flex items-center space-x-3">
+                <div className="bg-amber-500/20 p-2 rounded-xl">
+                  <Trophy className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white uppercase tracking-tight">How to Play Poker</h3>
+                  <p className="text-xs text-slate-500 font-semibold tracking-wide">Official PokerOrg Professional Guide</p>
+                </div>
+              </div>
+              <button onClick={() => setShowRules(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                <X className="w-6 h-6 text-slate-400" />
+              </button>
             </div>
 
             {/* Modal Body */}
             <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto text-slate-300 leading-relaxed custom-scrollbar">
-               <section>
-                 <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Quick-Start Texas Hold'em</h4>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2 text-xs">
-                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">1.</span> Each player gets two hole cards face-down.</p>
-                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">2.</span> Three communal cards are dealt face-up ('The Flop').</p>
-                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">3.</span> One more communal card is dealt ('The Turn').</p>
-                    </div>
-                    <div className="space-y-2 text-xs">
-                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">4.</span> A final communal card is dealt ('The River').</p>
-                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">5.</span> Remaining players reveal best 5-card hand ('Showdown').</p>
-                       <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">6.</span> Strongest hand wins the pot!</p>
-                    </div>
-                 </div>
-               </section>
+              <section>
+                <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Quick-Start Texas Hold'em</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2 text-xs">
+                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">1.</span> Each player gets two hole cards face-down.</p>
+                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">2.</span> Three communal cards are dealt face-up ('The Flop').</p>
+                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">3.</span> One more communal card is dealt ('The Turn').</p>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">4.</span> A final communal card is dealt ('The River').</p>
+                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">5.</span> Remaining players reveal best 5-card hand ('Showdown').</p>
+                    <p className="flex items-start"><span className="text-emerald-400 font-black mr-2">6.</span> Strongest hand wins the pot!</p>
+                  </div>
+                </div>
+              </section>
 
-               <section className="bg-white/5 p-4 rounded-2xl border border-white/10">
-                 <h4 className="text-white font-bold mb-3 flex items-center"><Coins className="w-4 h-4 mr-2 text-amber-400" /> Hand Rankings (Hierarchy)</h4>
-                 <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-[10px]">
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-emerald-400 font-bold">1. Royal Flush</span> <span>A,K,Q,J,10 (Same Suit)</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">2. Straight Flush</span> <span>5 Sequence, Same Suit</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">3. Four of a Kind</span> <span>4 Cards of one rank</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">4. Full House</span> <span>3 Rank + 2 Rank</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">5. Flush</span> <span>5 of Same Suit</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">6. Straight</span> <span>5 in Sequence</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">7. Three of a Kind</span> <span>3 of Same Rank</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">8. Two Pairs</span> <span>2 Different Pairs</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">9. One Pair</span> <span>2 of Same Rank</span></li>
-                   <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-slate-500 font-bold">10. High Card</span> <span>Highest Card Wins</span></li>
-                 </ul>
-               </section>
+              <section className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                <h4 className="text-white font-bold mb-3 flex items-center"><Coins className="w-4 h-4 mr-2 text-amber-400" /> Hand Rankings (Hierarchy)</h4>
+                <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-[10px]">
+                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-emerald-400 font-bold">1. Royal Flush</span> <span>A,K,Q,J,10 (Same Suit)</span></li>
+                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">2. Straight Flush</span> <span>5 Sequence, Same Suit</span></li>
+                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">3. Four of a Kind</span> <span>4 Cards of one rank</span></li>
+                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">4. Full House</span> <span>3 Rank + 2 Rank</span></li>
+                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">5. Flush</span> <span>5 of Same Suit</span></li>
+                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">6. Straight</span> <span>5 in Sequence</span></li>
+                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">7. Three of a Kind</span> <span>3 of Same Rank</span></li>
+                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">8. Two Pairs</span> <span>2 Different Pairs</span></li>
+                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-white font-bold">9. One Pair</span> <span>2 of Same Rank</span></li>
+                  <li className="flex justify-between border-b border-white/5 pb-1"><span className="text-slate-500 font-bold">10. High Card</span> <span>Highest Card Wins</span></li>
+                </ul>
+              </section>
 
-               <section>
-                 <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Professional Strategy</h4>
-                 <div className="space-y-4">
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
-                       <h5 className="text-white font-bold text-xs mb-1">Rule of 4 and 2</h5>
-                       <p className="text-[11px] opacity-70">Count your 'outs' (cards you need). Multiply by 4 on the flop (2 cards to come) or by 2 on the turn (1 card to come) to get your % chance to win.</p>
-                    </div>
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
-                       <h5 className="text-white font-bold text-xs mb-1">Understanding Position</h5>
-                       <p className="text-[11px] opacity-70">Acting after others gives you more information. Having 'position' is a massive strategic advantage in Texas Hold'em.</p>
-                    </div>
-                 </div>
-               </section>
+              <section>
+                <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Professional Strategy</h4>
+                <div className="space-y-4">
+                  <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                    <h5 className="text-white font-bold text-xs mb-1">Rule of 4 and 2</h5>
+                    <p className="text-[11px] opacity-70">Count your 'outs' (cards you need). Multiply by 4 on the flop (2 cards to come) or by 2 on the turn (1 card to come) to get your % chance to win.</p>
+                  </div>
+                  <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                    <h5 className="text-white font-bold text-xs mb-1">Understanding Position</h5>
+                    <p className="text-[11px] opacity-70">Acting after others gives you more information. Having 'position' is a massive strategic advantage in Texas Hold'em.</p>
+                  </div>
+                </div>
+              </section>
 
-               <section>
-                 <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Betting Options</h4>
-                 <div className="grid grid-cols-2 gap-3 text-[11px]">
-                   <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>CALL:</strong> Match the current bet.</div>
-                   <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>RAISE:</strong> Increase the current bet.</div>
-                   <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>CHECK:</strong> Pass turn (if no prior bet).</div>
-                   <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>FOLD:</strong> Exit the current hand.</div>
-                 </div>
-               </section>
+              <section>
+                <h4 className="text-amber-400 font-black uppercase text-sm tracking-widest mb-3">Betting Options</h4>
+                <div className="grid grid-cols-2 gap-3 text-[11px]">
+                  <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>CALL:</strong> Match the current bet.</div>
+                  <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>RAISE:</strong> Increase the current bet.</div>
+                  <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>CHECK:</strong> Pass turn (if no prior bet).</div>
+                  <div className="bg-black/20 p-2 rounded-lg border border-white/5"><strong>FOLD:</strong> Exit the current hand.</div>
+                </div>
+              </section>
             </div>
 
             {/* Modal Footer */}
             <div className="p-6 bg-black/20 border-t border-white/5 flex justify-center text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">
-               Courtesy of Poker.org Professional Standards
+              Courtesy of Poker.org Professional Standards
             </div>
           </div>
         </div>
-      )}
-    </div>
-  );
+       )}
+          {/* Portrait Orientation Hint Overlay */}
+          <div className="landscape-hint pointer-events-none">
+            <div className="phone-tilt"></div>
+            <h2 className="text-2xl font-black mb-2">PLEASE TILT YOUR PHONE</h2>
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">For the best poker experience, play in landscape mode.</p>
+          </div>
+        </div>
+      );
 }
+

@@ -1,12 +1,21 @@
 import { GameState, Card } from '../types';
 import Hand from 'pokersolver';
+import { createSidePots } from './pot';
 
 const formatCard = (c: Card) => `${c.rank}${c.suit}`;
 
 export const evaluateShowdown = (state: GameState): GameState => {
-  const newState = { ...state, players: state.players.map(p => ({ ...p })) };
+  // Ensure we have calculated the pots before evaluating winners
+  // This is critical if the game ends early (everyone folds)
+  const stateWithPots = createSidePots(state);
+  const newState = { ...stateWithPots, players: stateWithPots.players.map(p => ({ ...p })) };
   
-  if (!newState.isActive || newState.sidePots.length === 0) return newState;
+  if (!newState.isActive) return newState;
+  
+  if (newState.sidePots.length === 0) {
+     newState.isActive = false;
+     return newState;
+  }
 
   const communityStr = newState.communityCards.map(formatCard);
   
@@ -53,7 +62,8 @@ export const evaluateShowdown = (state: GameState): GameState => {
 
     // Give remainder to out of position player (or just dealer for simplicity)
     if (remainder > 0) {
-      newState.players.find(p => p.id === winnerIds[0])!.chips += remainder;
+      const firstWinner = newState.players.find(p => p.id === winnerIds[0]);
+      if (firstWinner) firstWinner.chips += remainder;
     }
 
     newState.winners.push({
