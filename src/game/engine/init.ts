@@ -14,16 +14,29 @@ export const initGame = (id: string, players: Player[], settings: any, prevDeale
 
   let deck = shuffleDeck(createDeck());
   
+  // Helper to find next active player
+  const findNextActive = (startIdx: number): number => {
+    let current = startIdx % newPlayers.length;
+    let loops = 0;
+    while (newPlayers[current].isFolded && loops < newPlayers.length) {
+      current = (current + 1) % newPlayers.length;
+      loops++;
+    }
+    return current;
+  };
+
   // Determine dealer index
-  let dealerIndex = typeof prevDealerIndex === 'number' 
-    ? (prevDealerIndex + 1) % newPlayers.length 
-    : 0;
+  let dealerIndex = findNextActive(typeof prevDealerIndex === 'number' ? prevDealerIndex + 1 : 0);
   
-  // Skip folded players (out of chips) for dealer button
-  let loops = 0;
-  while (newPlayers[dealerIndex].isFolded && loops < newPlayers.length) {
-    dealerIndex = (dealerIndex + 1) % newPlayers.length;
-    loops++;
+  // Blinds calculation
+  let smallBlindIndex, bigBlindIndex;
+  
+  if (activePlayersCount === 2) {
+    smallBlindIndex = dealerIndex;
+    bigBlindIndex = findNextActive(dealerIndex + 1);
+  } else {
+    smallBlindIndex = findNextActive(dealerIndex + 1);
+    bigBlindIndex = findNextActive(smallBlindIndex + 1);
   }
 
   // Deal hole cards
@@ -34,15 +47,6 @@ export const initGame = (id: string, players: Player[], settings: any, prevDeale
       }
     });
   }
-
-  // Blinds calculation
-  const smallBlindIndex = activePlayersCount === 2 
-    ? dealerIndex 
-    : (dealerIndex + 1) % newPlayers.length;
-  
-  const bigBlindIndex = activePlayersCount === 2
-    ? (dealerIndex + 1) % newPlayers.length
-    : (dealerIndex + 2) % newPlayers.length;
 
   let state: GameState = {
     id,
@@ -57,7 +61,7 @@ export const initGame = (id: string, players: Player[], settings: any, prevDeale
     smallBlindIndex,
     bigBlindIndex,
     round: 'preflop',
-    minRaise: smallBlindAmount * 2,
+    minRaise: smallBlindAmount * 2, // BB amount
     highestBet: 0,
     isActive: true,
     logs: [{ message: 'New Hand Started', timestamp: Date.now() }],

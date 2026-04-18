@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo, useMemo } from 'react';
 import { Player } from '../game/types';
 import { CardView, cn } from './CardView';
 import { Coins, Cpu, Crown, Home, Volume2 } from 'lucide-react';
@@ -15,7 +15,7 @@ interface PlayerSeatProps {
   lastLog?: string;
 }
 
-export const PlayerSeat = ({ 
+export const PlayerSeat = memo(({ 
   player, isActiveTurn, isDealer, positionClass, isSelf, showCards, turnStartedAt, turnTimeoutSeconds, lastLog 
 }: PlayerSeatProps) => {
   const [timeLeft, setTimeLeft] = useState(turnTimeoutSeconds);
@@ -117,14 +117,23 @@ export const PlayerSeat = ({
         {/* Action Chips Indicator (Next to cards) */}
         {player.currentBet > 0 && (
             <div className={cn(
-                "absolute top-0 flex space-x-0.5 pointer-events-none",
-                positionClass.includes("right") ? "-left-12" : "-right-12"
+                "absolute -top-6 flex space-x-1 pointer-events-none filter drop-shadow-lg",
+                positionClass.includes("right") ? "-left-14" : "-right-14"
             )}>
-                <div className="grid grid-cols-2 gap-0.5 p-1 bg-black/20 rounded-lg">
-                    <div className="w-3 h-3 rounded-full bg-blue-500 border border-white/20 shadow-sm" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500 border border-white/20 shadow-sm" />
-                    <div className="w-3 h-3 rounded-full bg-red-500 border border-white/20 shadow-sm" />
-                    <div className="w-3 h-3 rounded-full bg-white border border-white/20 shadow-sm" />
+                {/* 3D Stack 1 (Blue) */}
+                <div className="flex flex-col-reverse items-center -space-y-1">
+                   <div className="w-4 h-1.5 rounded-full bg-blue-600 border border-black/20" />
+                   <div className="w-4 h-1.5 rounded-full bg-blue-500 border border-white/20" />
+                </div>
+                {/* 3D Stack 2 (Red) */}
+                <div className="flex flex-col-reverse items-center -space-y-1 mt-1">
+                   <div className="w-4 h-1.5 rounded-full bg-red-700 border border-black/20" />
+                   <div className="w-4 h-1.5 rounded-full bg-red-500 border border-white/20" />
+                </div>
+                {/* 3D Stack 3 (Yellow) */}
+                <div className="flex flex-col-reverse items-center -space-y-1">
+                   <div className="w-4 h-1.5 rounded-full bg-yellow-600 border border-black/20" />
+                   <div className="w-4 h-1.5 rounded-full bg-yellow-400 border border-white/20" />
                 </div>
             </div>
         )}
@@ -137,4 +146,6 @@ export const PlayerSeat = ({
 
     </div>
   );
-};
+});
+
+PlayerSeat.displayName = 'PlayerSeat';

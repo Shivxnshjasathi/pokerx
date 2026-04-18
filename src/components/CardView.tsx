@@ -1,3 +1,4 @@
+import React, { memo } from 'react';
 import { Card } from '../game/types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -6,14 +7,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const CardView = ({ card, hidden, className }: { card?: Card; hidden?: boolean, className?: string }) => {
+export const CardView = memo(({ card, hidden, className }: { card?: Card; hidden?: boolean, className?: string }) => {
   const isRed = card ? (card.suit === 'h' || card.suit === 'd') : false;
   const suitChar = card ? { h: '♥', d: '♦', c: '♣', s: '♠' }[card.suit] : '';
   
   return (
-    <div className={cn("relative w-14 h-20 sm:w-20 sm:h-28 md:w-24 md:h-32 [perspective:1200px] group", className)}>
+    <div className={cn("relative w-14 h-20 sm:w-16 sm:h-24 [perspective:1000px] group will-change-transform", className)}>
       <div className={cn(
-        "relative w-full h-full transition-all duration-700 [transform-style:preserve-3d]",
+        "relative w-full h-full transition-all duration-700 [transform-style:preserve-3d] will-change-transform",
         (hidden || !card) ? "" : "[transform:rotateY(180deg)]"
       )}>
         {/* Back Face - Custom Poker Pattern */}
@@ -54,4 +55,6 @@ export const CardView = ({ card, hidden, className }: { card?: Card; hidden?: bo
       </div>
     </div>
   );
-};
+});
+
+CardView.displayName = 'CardView';

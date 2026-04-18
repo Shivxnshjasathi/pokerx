@@ -32,8 +32,18 @@ export const useGameState = (tableId: string) => {
   }, [tableId]);
 
   const sendAction = async (action: Action) => {
-    if (!tableId) return;
+    if (!tableId || !gameState) return;
     
+    // Optimistic Update: Apply action locally for instant feedback
+    const previousState = { ...gameState };
+    try {
+        const optimisticState = applyAction(gameState, action);
+        setGameState(optimisticState);
+    } catch (e) {
+        // If local apply fails (e.g. invalid action), don't send to server
+        return;
+    }
+
     try {
       await runTransaction(db, async (transaction) => {
         const tableRef = doc(db, 'tables', tableId);
@@ -46,12 +56,13 @@ export const useGameState = (tableId: string) => {
         const currentState = tableSnap.data() as GameState;
         const newState = applyAction(currentState, action);
         
-        // We use set since applyAction returns the full fresh state
         transaction.set(tableRef, newState);
       });
     } catch (e: any) {
       console.error("Transaction failed:", e.message);
-      // Only alert on non-critical errors or handle specifically
+      // Rollback optimistic update on server failure
+      setGameState(previousState);
+      
       if (!e.message.includes("Not your turn")) {
          alert(e.message);
       }

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Table } from '../components/Table';
 import { cn } from '../components/CardView';
 import { useGameState } from '../hooks/useGameState';
 import { initGame } from '../game/engine/init';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion, deleteDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { Coins, Play, UserPlus, PlusCircle, Wallet, LogOut, TrendingUp, X, Trophy, Bot, Cpu, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Coins, Play, UserPlus, PlusCircle, Wallet, LogOut, TrendingUp, X, Trophy, Bot, Cpu, ArrowUpRight, ArrowDownRight, Menu, Settings, Info } from 'lucide-react';
 import { Player, GameSettings } from '../game/types';
 import { getBotAction } from '../game/engine/bot';
 
@@ -19,9 +19,20 @@ export default function Home() {
   const [myPlayerId, setMyPlayerId] = useState('');
   const [showLedger, setShowLedger] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
   const [turnTimeout, setTurnTimeout] = useState(15);
 
   const { gameState, loading, sendAction } = useGameState(inGame ? tableId : '');
+  const hasReceivedInitialState = useRef(false);
+  const lastTurnActedRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (gameState) hasReceivedInitialState.current = true;
+    if (!inGame) {
+      hasReceivedInitialState.current = false;
+      lastTurnActedRef.current = null;
+    }
+  }, [gameState, inGame]);
 
   const createTable = async () => {
     if (!playerName) {
@@ -35,7 +46,8 @@ export default function Home() {
     const newPlayerId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
 
     setMyPlayerId(newPlayerId);
-    setInGame(true);
+    // setInGame moved to after setDoc
+
 
     const settings: GameSettings = {
       startingChips: Number(startingChips) || 1000,
@@ -78,6 +90,7 @@ export default function Home() {
         lastActivity: Date.now(),
         logs: [{ message: `Table created by ${playerName}`, timestamp: Date.now() }]
       });
+      setInGame(true);
     } catch (e: any) {
       console.error(e);
       alert(e.message);
@@ -88,7 +101,8 @@ export default function Home() {
     if (!tableId || !playerName) return;
     const newPlayerId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
     setMyPlayerId(newPlayerId);
-    setInGame(true);
+    // setInGame moved to end of try
+
 
     try {
       const ref = doc(db, 'tables', tableId);
@@ -153,6 +167,7 @@ export default function Home() {
           logs: [{ message: `Table created by ${playerName}`, timestamp: Date.now() }]
         });
       }
+      setInGame(true);
     } catch (e: any) {
       console.error(e);
     }
@@ -285,9 +300,12 @@ export default function Home() {
     // To prevent race conditions, only the first human player in the list handles bots
     const firstHuman = gameState.players.find(p => !p.isBot);
     if (firstHuman?.id !== myPlayerId) return;
+    if (lastTurnActedRef.current === gameState.currentTurnIndex) return;
 
     // Small delay to make it feel human
     const timer = setTimeout(() => {
+      if (lastTurnActedRef.current === gameState.currentTurnIndex) return;
+      lastTurnActedRef.current = gameState.currentTurnIndex;
       const action = getBotAction(gameState, currentPlayer.id);
       sendAction(action);
     }, 1500 + Math.random() * 2000);
@@ -319,6 +337,7 @@ export default function Home() {
 
     const currentPlayer = gameState.players[gameState.currentTurnIndex];
     if (currentPlayer.id !== myPlayerId) return;
+    if (lastTurnActedRef.current === gameState.currentTurnIndex) return;
 
     const timeoutMs = (gameState.settings?.turnTimeoutSeconds || 15) * 1000;
     const elapsed = Date.now() - gameState.turnStartedAt;
@@ -326,6 +345,7 @@ export default function Home() {
 
     if (remaining <= 0) {
       // Time's up! Auto-fold or Check
+      lastTurnActedRef.current = gameState.currentTurnIndex;
       if (currentPlayer.currentBet >= gameState.highestBet) {
         sendAction({ playerId: myPlayerId, type: 'check' });
       } else {
@@ -335,6 +355,9 @@ export default function Home() {
     }
 
     const timer = setTimeout(() => {
+      if (lastTurnActedRef.current === gameState.currentTurnIndex) return;
+      lastTurnActedRef.current = gameState.currentTurnIndex;
+
       if (currentPlayer.currentBet >= gameState.highestBet) {
         sendAction({ playerId: myPlayerId, type: 'check' });
       } else {
@@ -347,7 +370,7 @@ export default function Home() {
 
   // Clean exit if table is deleted
   useEffect(() => {
-    if (inGame && !loading && !gameState && tableId) {
+    if (inGame && !loading && !gameState && tableId && hasReceivedInitialState.current) {
       setInGame(false);
       setMyPlayerId('');
       setTableId('');
@@ -468,83 +491,154 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#21113c] via-[#100624] to-[#0a0216] font-sans text-slate-200 overflow-hidden">
-      {/* Header */}
-      <header className="absolute top-0 left-0 right-0 p-3 sm:p-6 flex justify-between items-center z-50 bg-gradient-to-b from-black/40 to-transparent">
-        <div className="text-xl sm:text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">
-          POKERX <span className="text-slate-500 text-[10px] sm:text-sm ml-1 sm:ml-2 font-semibold tracking-widest">[{tableId}]</span>
+    <div className="min-h-screen bg-gradient-to-b from-[#21113c] via-[#100624] to-[#0a0216] font-sans text-slate-200 overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+      {/* Header - Minimalist Branding */}
+      <header className="absolute top-[env(safe-area-inset-top)] left-0 right-0 px-6 py-4 flex justify-between items-center z-[100]">
+        <div className="flex items-center space-x-4">
+           <div className="text-3xl font-black tracking-tighter italic">
+             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-white/80">POKER</span>
+             <span className="text-emerald-500">X</span>
+           </div>
+           <span className="hidden sm:inline-block px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-black tracking-widest text-slate-500">
+             ROOM ID: {tableId}
+           </span>
         </div>
 
-        {/* Actions / status */}
-        <div className="flex space-x-2 sm:space-x-4 items-center">
-          {gameState && (
-            <button
-              onClick={() => {
-                const amount = prompt("Top up amount (adds to your current stack):", "1000");
-                if (amount && parseInt(amount) > 0) {
-                  sendAction({ playerId: myPlayerId, type: 'top-up', amount: parseInt(amount) });
-                }
-              }}
-              className="bg-slate-800/80 hover:bg-slate-700 text-white rounded-full p-2 sm:px-4 sm:py-2 border border-white/10 flex items-center space-x-1 transition-all"
-            >
-              <Wallet className="w-4 h-4 text-emerald-400" />
-              <span className="text-[10px] sm:text-sm font-bold hidden xs:block">Top Up</span>
-            </button>
-          )}
-
-          {gameState && (
-            <button
-              onClick={() => setShowLedger(true)}
-              className="bg-slate-800/80 hover:bg-slate-700 text-white rounded-full p-2 sm:px-4 sm:py-2 border border-white/10 flex items-center space-x-1 transition-all"
-            >
-              <TrendingUp className="w-4 h-4 text-emerald-400" />
-              <span className="text-[10px] sm:text-sm font-bold hidden xs:block">Ledger</span>
-            </button>
-          )}
-
-          {gameState && (
-            <button
-              onClick={() => setShowRules(true)}
-              className="bg-slate-800/80 hover:bg-slate-700 text-white rounded-full p-2 sm:px-4 sm:py-2 border border-white/10 flex items-center space-x-1 transition-all"
-            >
-              <Trophy className="w-4 h-4 text-amber-400" />
-              <span className="text-[10px] sm:text-sm font-bold hidden xs:block">Rules</span>
-            </button>
-          )}
-
-          {gameState && !gameState.isActive && (
-            <button
-              onClick={addBot}
-              className="bg-slate-800/80 hover:bg-white/10 text-white rounded-full p-2 sm:px-4 sm:py-2 border border-white/10 flex items-center space-x-1 transition-all"
-            >
-              <Cpu className="w-4 h-4 text-purple-400" />
-              <span className="text-[10px] sm:text-sm font-bold hidden xs:block">Add Bot</span>
-            </button>
-          )}
-
-          {gameState && !gameState.isActive && (
-            <button
-              onClick={handleStartGame}
-              className="bg-amber-600 hover:bg-amber-500 text-white px-4 sm:px-6 py-2 rounded-lg font-bold flex items-center space-x-2 transition-all hover:shadow-[0_0_20px_rgba(217,119,6,0.5)] text-xs sm:text-sm"
-            >
-              <Play className="w-4 h-4" />
-              <span className="whitespace-nowrap">{gameState.round === 'showdown' ? 'Next Hand' : 'Start Game'}</span>
-            </button>
-          )}
-
-          <button
-            onClick={leaveTable}
-            className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 rounded-full p-2 border border-rose-500/20 transition-all"
-            title="Leave Table"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
+        <button 
+          onClick={() => setShowDrawer(true)}
+          className="p-3 bg-white/5 border border-white/10 rounded-[20px] hover:bg-white/10 transition-all active:scale-95 shadow-2xl backdrop-blur-md"
+        >
+          <Menu className="w-6 h-6 text-white" />
+        </button>
       </header>
+
+      {/* Side Drawer - Premium Game Controls */}
+      <div className={cn(
+        "fixed inset-0 z-[200] transition-opacity duration-500",
+        showDrawer ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      )}>
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDrawer(false)} />
+        
+        {/* Drawer Panel */}
+        <div className={cn(
+          "absolute top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-[#0c041a]/95 backdrop-blur-3xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-out p-8 flex flex-col pt-[env(safe-area-inset-top)]",
+          showDrawer ? "translate-x-0" : "translate-x-full"
+        )}>
+           <div className="flex justify-between items-center mb-10">
+              <h3 className="text-xl font-black uppercase tracking-widest text-white/40 italic">Menu</h3>
+              <button 
+                onClick={() => setShowDrawer(false)}
+                className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                id="close-drawer"
+              >
+                 <X className="w-6 h-6 text-white/50" />
+              </button>
+           </div>
+
+           <div className="flex-1 space-y-4">
+              {/* Wallet / Top Up */}
+              <button 
+                onClick={() => {
+                  const amount = prompt("Top up amount:", "1000");
+                  if (amount && parseInt(amount) > 0) {
+                    sendAction({ playerId: myPlayerId, type: 'top-up', amount: parseInt(amount) });
+                    setShowDrawer(false);
+                  }
+                }}
+                className="w-full p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[24px] flex items-center group transition-all"
+              >
+                 <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 flex items-center justify-center mr-4">
+                    <Wallet className="w-5 h-5 text-emerald-400" />
+                 </div>
+                 <div className="text-left">
+                    <div className="text-sm font-black text-white">Refill Wallet</div>
+                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Add Chips to Stack</div>
+                 </div>
+              </button>
+
+              <button 
+                onClick={() => { setShowLedger(true); setShowDrawer(false); }}
+                className="w-full p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[24px] flex items-center group transition-all"
+              >
+                 <div className="w-10 h-10 rounded-2xl bg-amber-500/20 flex items-center justify-center mr-4">
+                    <TrendingUp className="w-5 h-5 text-amber-400" />
+                 </div>
+                 <div className="text-left">
+                    <div className="text-sm font-black text-white">Financials</div>
+                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Hand History & Ledger</div>
+                 </div>
+              </button>
+
+              <button 
+                onClick={() => { setShowRules(true); setShowDrawer(false); }}
+                className="w-full p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[24px] flex items-center group transition-all"
+              >
+                 <div className="w-10 h-10 rounded-2xl bg-blue-500/20 flex items-center justify-center mr-4">
+                    <Info className="w-5 h-5 text-blue-400" />
+                 </div>
+                 <div className="text-left">
+                    <div className="text-sm font-black text-white">Game Rules</div>
+                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Rankings Guide</div>
+                 </div>
+              </button>
+
+              <div className="pt-6 pb-2">
+                 <div className="h-px bg-white/5 w-full mb-4" />
+                 <div className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mb-4 ml-2">Session Control</div>
+              </div>
+
+              {gameState && (
+                 <button 
+                    onClick={() => { handleStartGame(); setShowDrawer(false); }}
+                    className="w-full p-6 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white border border-emerald-400/20 rounded-[28px] flex items-center shadow-lg shadow-emerald-900/40 group transition-all"
+                 >
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center mr-4">
+                       <Play className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                       <div className="text-base font-black uppercase tracking-tighter">Start Hand</div>
+                       <div className="text-[9px] font-bold text-white/50 uppercase tracking-widest italic">Proceed to Dealing</div>
+                    </div>
+                 </button>
+              )}
+
+              {gameState && !gameState.isActive && (
+                 <button 
+                    onClick={() => { addBot(); setShowDrawer(false); }}
+                    className="w-full p-5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-[24px] flex items-center group transition-all"
+                 >
+                    <div className="w-10 h-10 rounded-2xl bg-purple-500/20 flex items-center justify-center mr-4">
+                       <Cpu className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div className="text-left">
+                       <div className="text-sm font-black text-white">Join Bots</div>
+                       <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Add Professional AI</div>
+                    </div>
+                 </button>
+              )}
+           </div>
+
+           <div className="mt-auto pt-10">
+              <button 
+                onClick={leaveTable}
+                className="w-full p-5 bg-rose-500/5 hover:bg-rose-500/10 text-rose-500 border border-rose-500/10 rounded-[24px] flex items-center group transition-all"
+              >
+                 <div className="w-10 h-10 rounded-2xl bg-rose-500/20 flex items-center justify-center mr-4">
+                    <LogOut className="w-5 h-5" />
+                 </div>
+                 <div className="text-left">
+                    <div className="text-sm font-black">Disconnect</div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest opacity-60">Exit Current Session</div>
+                 </div>
+              </button>
+           </div>
+        </div>
+      </div>
 
       {/* Main Table Area */}
       {gameState ? (
-        <Table gameState={gameState} playerId={myPlayerId} onAction={sendAction} />
+        <Table gameState={gameState} playerId={myPlayerId} onAction={sendAction} onNextHand={handleStartGame} />
       ) : (
         <div className="h-screen flex items-center justify-center">
           <div className="text-xl font-semibold text-slate-400 animate-pulse">Waiting for table data...</div>
@@ -707,14 +801,14 @@ export default function Home() {
             </div>
           </div>
         </div>
-       )}
-          {/* Portrait Orientation Hint Overlay */}
-          <div className="landscape-hint pointer-events-none">
-            <div className="phone-tilt"></div>
-            <h2 className="text-2xl font-black mb-2">PLEASE TILT YOUR PHONE</h2>
-            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">For the best poker experience, play in landscape mode.</p>
-          </div>
-        </div>
-      );
+      )}
+      {/* Portrait Orientation Hint Overlay */}
+      <div className="landscape-hint pointer-events-none">
+        <div className="phone-tilt"></div>
+        <h2 className="text-2xl font-black mb-2">PLEASE TILT YOUR PHONE</h2>
+        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">For the best poker experience, play in landscape mode.</p>
+      </div>
+    </div>
+  );
 }
 
