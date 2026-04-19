@@ -20,7 +20,7 @@ export default function Home() {
   const [showLedger, setShowLedger] = useState(false);
   const [showRules, setShowRules] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [turnTimeout, setTurnTimeout] = useState(15);
+  const [turnTimeout, setTurnTimeout] = useState(45);
   const [isJoining, setIsJoining] = useState(false);
 
   const { gameState, loading: isTableLoading, sendAction } = useGameState(inGame ? tableId : '');
@@ -53,7 +53,7 @@ export default function Home() {
     const settings: GameSettings = {
       startingChips: Number(startingChips) || 1000,
       smallBlind: Math.max(10, Math.floor((Number(startingChips) || 1000) / 100)),
-      turnTimeoutSeconds: Number(turnTimeout) || 15
+      turnTimeoutSeconds: Number(turnTimeout) || 45
     };
 
     const newPlayer: Player = {
@@ -217,7 +217,7 @@ export default function Home() {
     const settings: GameSettings = {
       startingChips: 1000,
       smallBlind: 10,
-      turnTimeoutSeconds: 10 // faster for solo
+      turnTimeoutSeconds: 45 // faster for solo
     };
 
     const me: Player = {
@@ -324,7 +324,7 @@ export default function Home() {
     if (currentPlayer.id !== myPlayerId) return;
     if (lastTurnActedRef.current === gameState.currentTurnIndex) return;
 
-    const timeoutMs = (gameState.settings?.turnTimeoutSeconds || 15) * 1000;
+    const timeoutMs = (gameState.settings?.turnTimeoutSeconds || 45) * 1000;
     const elapsed = Date.now() - gameState.turnStartedAt;
     const remaining = timeoutMs - elapsed;
 

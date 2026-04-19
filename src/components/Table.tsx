@@ -130,6 +130,8 @@ export const Table = ({ gameState, playerId, onAction, onNextHand }: TableProps)
               player={player}
               isActiveTurn={gameState.currentTurnIndex === gameState.players.findIndex(p => p.id === player.id) && gameState.isActive}
               isDealer={gameState.dealerIndex === gameState.players.findIndex(p => p.id === player.id)}
+              isSmallBlind={gameState.smallBlindIndex === gameState.players.findIndex(p => p.id === player.id)}
+              isBigBlind={gameState.bigBlindIndex === gameState.players.findIndex(p => p.id === player.id)}
               positionClass={positions[i % positions.length]}
               isSelf={player.id === playerId}
               showCards={!gameState.isActive}

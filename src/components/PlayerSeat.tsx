@@ -12,10 +12,12 @@ interface PlayerSeatProps {
   turnStartedAt: number;
   turnTimeoutSeconds: number;
   lastLog?: string;
+  isSmallBlind?: boolean;
+  isBigBlind?: boolean;
 }
 
 export const PlayerSeat = memo(({ 
-  player, isActiveTurn, isDealer, positionClass, isSelf, showCards, turnStartedAt, turnTimeoutSeconds, lastLog 
+  player, isActiveTurn, isDealer, positionClass, isSelf, showCards, turnStartedAt, turnTimeoutSeconds, lastLog, isSmallBlind, isBigBlind 
 }: PlayerSeatProps) => {
   const [timeLeft, setTimeLeft] = useState(turnTimeoutSeconds);
 
@@ -101,7 +103,35 @@ export const PlayerSeat = memo(({
                 <span className="text-red-700 font-black text-xs">D</span>
             </div>
         )}
+
+        {/* Small Blind Button */}
+        {isSmallBlind && (
+            <div className="absolute -left-4 top-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-600 border border-white shadow-md flex items-center justify-center z-50">
+                <span className="text-white font-black text-[10px]">SB</span>
+            </div>
+        )}
+
+        {/* Big Blind Button */}
+        {isBigBlind && (
+            <div className="absolute -left-4 top-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-orange-600 border border-white shadow-md flex items-center justify-center z-50">
+                <span className="text-white font-black text-[10px]">BB</span>
+            </div>
+        )}
       </div>
+
+      {/* Current Bet Chips (Animated) */}
+      {player.currentBet > 0 && (
+         <div className="absolute -top-8 sm:-top-10 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-2 fade-in duration-300">
+            <div className="flex flex-col items-center">
+               <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-200 via-amber-400 to-amber-600 border border-white/40 shadow-[0_4px_10px_rgba(0,0,0,0.5)] mb-1 flex items-center justify-center">
+                   <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-amber-800/20" />
+               </div>
+               <span className="bg-black/60 backdrop-blur-sm text-amber-400 font-black text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-lg">
+                  ${player.currentBet}
+               </span>
+            </div>
+         </div>
+      )}
 
       {/* Active Timer Overlay */}
       {isActiveTurn && (

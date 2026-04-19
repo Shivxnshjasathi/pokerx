@@ -30,13 +30,25 @@ export const applyAction = (state: GameState, action: Action): GameState => {
   }
 
   if (action.type === 'leave') {
-    newState.players = newState.players.filter(p => p.id !== action.playerId);
-    newState.logs.push({ message: `A player left the table`, timestamp: Date.now() });
-    
-    // If table becomes empty, or game was active and current player left, handle it?
-    // For now keep it simple: just remove. logic will skip their turn.
-    newState.lastActivity = Date.now();
-    return newState;
+    const leavingIndex = newState.players.findIndex(p => p.id === action.playerId);
+    if (leavingIndex === -1) return newState;
+
+    // Mark them as folded and zero their chips instead of completely removing them from the array 
+    // mid-hand to preserve indices. We only remove them fully if game is NOT active.
+    if (newState.isActive) {
+      newState.players[leavingIndex].isFolded = true;
+      newState.players[leavingIndex].chips = 0;
+      newState.logs.push({ message: `${newState.players[leavingIndex].name} left the game`, timestamp: Date.now() });
+      newState.lastActivity = Date.now();
+      
+      // Re-trigger calculateNextTurn to skip them if it was their turn, or if game needs to end
+      return calculateNextTurn(newState);
+    } else {
+      newState.players = newState.players.filter(p => p.id !== action.playerId);
+      newState.logs.push({ message: `A player left the table`, timestamp: Date.now() });
+      newState.lastActivity = Date.now();
+      return newState;
+    }
   }
 
   if (action.type === 'top-up') {

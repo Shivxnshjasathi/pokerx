@@ -8,6 +8,7 @@ export const advanceRound = (state: GameState): GameState => {
   // Actually, we should clean them.
   newState.players = newState.players.map(p => ({ ...p, currentBet: 0, hasActed: false }));
   newState.highestBet = 0;
+  newState.minRaise = newState.settings.smallBlind * 2; // Reset minRaise to 1 Big Blind
 
   // Check if hand is already over (everyone folded except 1 or everyone all in)
   const activeUnfolded = newState.players.filter(p => !p.isFolded);

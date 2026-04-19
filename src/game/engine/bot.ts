@@ -54,9 +54,10 @@ export const getBotAction = (state: GameState, botId: string): Action => {
     return currentCallAmount === 0 ? { playerId: botId, type: 'check' } : { playerId: botId, type: 'call' };
   } else if (decisionFactor < 6) {
     // Raise a bit
-    const raiseAmt = state.settings.smallBlind * 2;
-    if (bot.chips > state.highestBet + raiseAmt) {
-        return { playerId: botId, type: 'raise', amount: state.highestBet + raiseAmt };
+    const minRaiseNeeded = state.minRaise > 0 ? state.minRaise : state.settings.smallBlind * 2;
+    const raiseAmt = state.highestBet + minRaiseNeeded;
+    if (bot.chips + bot.currentBet >= raiseAmt) {
+        return { playerId: botId, type: 'raise', amount: raiseAmt };
     }
     return { playerId: botId, type: 'call' };
   } else {
